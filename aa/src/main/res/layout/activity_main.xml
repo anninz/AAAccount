@@ -20,22 +20,32 @@
         android:layout_centerHorizontal="true" />
 
     <Button
-        android:text="进入活动"
+        android:text="所有活动"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="gotoAction"
+        android:onClick="gotoAllAction"
         android:id="@+id/button2"
         android:layout_below="@+id/button"
         android:layout_alignStart="@+id/button"
-        android:layout_marginTop="37dp" />
+        android:layout_marginTop="26dp" />
 
     <Button
         android:text="创建活动项"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="39dp"
+        android:layout_marginTop="26dp"
         android:id="@+id/button3"
         android:onClick="createActionItem"
         android:layout_below="@+id/button2"
         android:layout_alignStart="@+id/button2" />
+
+    <Button
+        android:text="最近活动"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/button3"
+        android:layout_alignEnd="@+id/button3"
+        android:layout_marginTop="26dp"
+        android:onClick="gotoAction"
+        android:id="@+id/button6" />
 </RelativeLayout>

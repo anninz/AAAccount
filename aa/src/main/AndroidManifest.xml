@@ -41,6 +41,13 @@
                 <action android:name="android.intent.action.CREATE_ACTION"/>
             </intent-filter>
         </activity>
+        <activity android:name=".ViewAllActionActivity"
+            android:label="@string/app_name_view_all_activity"
+            android:theme="@style/AppTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.CREATE_ACTION"/>
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

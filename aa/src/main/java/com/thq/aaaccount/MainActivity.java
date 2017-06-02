@@ -9,14 +9,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Toast;
 
+import java.util.Set;
+
 public class MainActivity extends AppCompatActivity {
 
 
     private Toolbar mToolbar;
 
-
-    SharedPreferences mSP;
-    SharedPreferences.Editor mEditor;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,8 +26,9 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(mToolbar);
         mToolbar.setTitle(R.string.app_name);
 
-        mSP = getSharedPreferences("data", Context.MODE_PRIVATE);
-        mEditor = mSP.edit();
+        if (Utils.getLastestActivityId(this) < 0) {
+            Utils.setSPInt("activitynums", 0, "allactivity", this);
+        }
     }
 
     public void createAction(View view) {
@@ -36,15 +36,27 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void gotoAction(View view) {
-        Intent intent = new Intent(MainActivity.this, ViewActionItemActivity.class);
+    public void gotoAllAction(View view) {
+        Intent intent = new Intent(MainActivity.this, ViewAllActionActivity.class);
+//        intent.putExtra("activityId", ""+Utils.getLastestActivityId(this));
         startActivity(intent);
+    }
+
+    public void gotoAction(View view) {
+        if (Utils.getLastestActivityId(this) > 0) {
+            Intent intent = new Intent(MainActivity.this, ViewActionItemActivity.class);
+            intent.putExtra("activityId", "" + Utils.getLastestActivityId(this));
+            startActivity(intent);
+        } else {
+            Toast.makeText(this, "请先创建活动", Toast.LENGTH_SHORT).show();
+        }
     }
 
 
     public void createActionItem(View view) {
-        if ( mSP.getStringSet("Members", null) != null) {
+        if (Utils.getLastestActivityId(this) > 0) {
             Intent intent = new Intent(MainActivity.this, CreateActionItemActivity.class);
+//            intent.putExtra("activityName", itemName);
             startActivity(intent);
         } else {
             Toast.makeText(this, "请先创建活动", Toast.LENGTH_SHORT).show();

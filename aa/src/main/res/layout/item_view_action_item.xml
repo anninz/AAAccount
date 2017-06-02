@@ -16,7 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColor="@android:color/holo_red_light"
-        android:id="@+id/item_name"
+        android:id="@+id/action_name"
         android:layout_weight="0.07" />
 
     <TextView
@@ -30,7 +30,7 @@
         android:text="TextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/payer"
+        android:id="@+id/cteate_time"
         android:layout_weight="0.07" />
 
     <LinearLayout
@@ -43,7 +43,7 @@
             android:text="TextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/total"
+            android:id="@+id/create_date"
             android:layout_weight="1"
             />
 

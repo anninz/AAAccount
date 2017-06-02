@@ -40,12 +40,17 @@ public class CreateActionActivity extends AppCompatActivity {
 
     private RecyclerView mRecyclerView;
     private LinearLayoutManager mLayoutManager;
-    private List<People> myDataset;
+    private List<Member> myDataset;
     private MyAdapter mAdapter;
     private Set<String> mSet;
+    private Set<String> mActivitySet;
     List<ViewHolder> mHolder;
 
-    private EditText mActionName;
+
+    SharedPreferences mActivitySP;
+    SharedPreferences.Editor mActivityEditor;
+
+    private EditText mActionNameView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -57,7 +62,11 @@ public class CreateActionActivity extends AppCompatActivity {
         setSupportActionBar(mToolbar);
         mToolbar.setTitle(R.string.app_name_create_action);
 
-        mActionName = (EditText) findViewById(R.id.edit_text_action_name);
+
+        mActivitySP = getSharedPreferences("allactivity", Context.MODE_PRIVATE);
+        mActivityEditor = mActivitySP.edit();
+
+        mActionNameView = (EditText) findViewById(R.id.edit_text_action_name);
 
         //RecyclerView
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
@@ -69,9 +78,12 @@ public class CreateActionActivity extends AppCompatActivity {
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         mSet = new HashSet<>();
+        mActivitySet = new HashSet<>();
+        mActivitySet = mActivitySP.getStringSet("allactivitys", null);
+
         // specify an adapter (see also next example)
         myDataset = new ArrayList<>();
-        People people = new People("");
+        Member people = new Member("");
         myDataset.add(people);
         mAdapter = new MyAdapter(this, myDataset);
         mRecyclerView.setAdapter(mAdapter);
@@ -80,14 +92,14 @@ public class CreateActionActivity extends AppCompatActivity {
     @Override
     public void onStop() {
         super.onStop();
-        for (ViewHolder viewHolder:mHolder) {
-            if (viewHolder.patNum > 0) {
-                StringBuffer stringBuffer = new StringBuffer();
-                stringBuffer.append(viewHolder.patNum + "#");
-                stringBuffer.append(viewHolder.apkPath + "#");
-//                stringBuffer.append(viewHolder.mTextView.getText().toString());
-                mSet.add(stringBuffer.toString());
-            }
+//        for (ViewHolder viewHolder:mHolder) {
+//            if (viewHolder.patNum > 0) {
+//                StringBuffer stringBuffer = new StringBuffer();
+//                stringBuffer.append(viewHolder.patNum + "#");
+//                stringBuffer.append(viewHolder.apkPath + "#");
+////                stringBuffer.append(viewHolder.mTextView.getText().toString());
+//                mSet.add(stringBuffer.toString());
+//            }
 /*
             if (viewHolder.mCheckBox.isChecked()) {
                 StringBuffer stringBuffer = new StringBuffer();
@@ -97,7 +109,7 @@ public class CreateActionActivity extends AppCompatActivity {
                 mSet.add(stringBuffer.toString());
             }
 */
-        }
+//        }
 //        setSPSet("PatSet", mSet);
     }
 
@@ -122,10 +134,10 @@ public class CreateActionActivity extends AppCompatActivity {
         editor.commit();
     }
 
-    class People {
+    class Member {
         String mName;
         Bitmap mIcon;
-        People (String name) {
+        Member(String name) {
             mName = name;
         }
     }
@@ -192,12 +204,12 @@ public class CreateActionActivity extends AppCompatActivity {
 
     public class MyAdapter extends RecyclerView.Adapter<ViewHolder> {
         private final int mBackground;
-        private List<People> mDataset;
+        private List<Member> mDataset;
         private final TypedValue mTypedValue = new TypedValue();
-        private People editingPeople;
+        private Member editingPeople;
 
         // Provide a suitable constructor (depends on the kind of dataset)
-        public MyAdapter(Context context, List<People> myDataset) {
+        public MyAdapter(Context context, List<Member> myDataset) {
             mDataset = myDataset;
             editingPeople = myDataset.get(0);
             mHolder = new ArrayList<>();
@@ -205,19 +217,19 @@ public class CreateActionActivity extends AppCompatActivity {
             mBackground = mTypedValue.resourceId;
         }
 
-        public List<People> getPeoples() {
+        public List<Member> getPeoples() {
             return mDataset;
         }
 
         private void addPeople(String name) {
             editingPeople.mName = name;
-            editingPeople = new People("");
+            editingPeople = new Member("");
             mDataset.add(editingPeople);
             this.notifyDataSetChanged();
         }
 
         private void deletePeople(String name) {
-            for (People p:mDataset) {
+            for (Member p:mDataset) {
                 if (p.mName.equals(name)) {
                     mDataset.remove(p);
                     break;
@@ -245,7 +257,7 @@ public class CreateActionActivity extends AppCompatActivity {
         public void onBindViewHolder(ViewHolder holder, int position) {
             // - get element from your dataset at this position
             // - replace the contents of the view with that element
-            People pat = mDataset.get(position);
+            Member pat = mDataset.get(position);
 //            holder.mTextView.setText(pat.patName);
             if (pat.mIcon != null) {
                 BitmapDrawable bd = new BitmapDrawable(getResources(), pat.mIcon);
@@ -276,18 +288,40 @@ public class CreateActionActivity extends AppCompatActivity {
     };
 
     public void createActionDone(View v) {
-        if (mActionName.getText().toString().equals("") || myDataset.size() <= 1) {
+        String activityName = mActionNameView.getText().toString();
+        if (activityName.equals("") || myDataset.size() <= 1) {
             Toast.makeText(this, "请填写完整信息！", Toast.LENGTH_SHORT).show();
             return;
         }
-        setSPString("ActionName", mActionName.getText().toString());
+        if (mActivitySet != null) {
+            for (String s : mActivitySet) {
+                if (s.split("\\#")[0].equals(activityName)) {
+                    Toast.makeText(this, "活动名已存在，请重新输入！", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            }
+        }
+
+        int activitynums = mActivitySP.getInt("activitynums", -1);
+
+        if (mActivitySet == null) mActivitySet = new HashSet<>();
+        mActivitySet.add(activityName+"#"+(activitynums+1));
+        Utils.setSPSet("allactivitys", null, "allactivity", this);
+        Utils.setSPSet("allactivitys", mActivitySet, "allactivity", this);
+        Utils.setSPInt("activitynums", activitynums+1, "allactivity", this);
+
+
+//        setSPString("ActionName", mActionNameView.getText().toString());
 //        myDataset = mAdapter.getPeoples();
-        for (People p:myDataset) {
+        for (Member p:myDataset) {
             if (!p.mName.equals("")) {
                 mSet.add(p.mName);
             }
         }
-        setSPSet("Members", mSet);
+
+        Utils.setSPString("ActionName", activityName, "activity"+(activitynums+1), this);
+        Utils.setSPSet("Members", mSet, "activity"+(activitynums+1), this);
+//        setSPSet("Members", mSet);
         finish();
     }
 

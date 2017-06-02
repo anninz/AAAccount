@@ -26,15 +26,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class ViewActionItemActivity extends AppCompatActivity {
+public class ViewAllActionActivity extends AppCompatActivity {
 
-    private static final String TAG = "THQ MainActivity";
+    private static final String TAG = "MainActivity";
 
     private Toolbar mToolbar;
 
     private RecyclerView mRecyclerView;
     private LinearLayoutManager mLayoutManager;
-    private List<Item> myDataset;
+    private List<Activity> myDataset;
     private MyAdapter mAdapter;
     private Set<String> mSet;
     List<ViewHolder> mHolder;
@@ -48,20 +48,20 @@ public class ViewActionItemActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_view_action_item);
+        setContentView(R.layout.activity_view_all_action);
 
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            mActivityId = extras.getString("activityId");
-        }
-        mActivityFileName = "activity" + mActivityId;//Utils.getIdFromActivityName(this, activityName);
+//        Bundle extras = getIntent().getExtras();
+//        if (extras != null) {
+//            mActivityId = extras.getString("activityId");
+//        }
+        mActivityFileName = "allactivity";// + mActivityId;//Utils.getIdFromActivityName(this, activityName);
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         mToolbar.setTitle(R.string.app_name_view_item);
 
 
-        mSP = getSharedPreferences("activity" + mActivityId, Context.MODE_PRIVATE);
+        mSP = getSharedPreferences(mActivityFileName , Context.MODE_PRIVATE);
         mEditor = mSP.edit();
 
         //RecyclerView
@@ -83,9 +83,9 @@ public class ViewActionItemActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
         myDataset.clear();
-        loadItems();
+        loadActivitys();
         if (mAdapter == null) {
-            mAdapter = new ViewActionItemActivity.MyAdapter(this, myDataset);
+            mAdapter = new ViewAllActionActivity.MyAdapter(this, myDataset);
             mRecyclerView.setAdapter(mAdapter);
         } else {
             mAdapter.update();
@@ -117,16 +117,15 @@ public class ViewActionItemActivity extends AppCompatActivity {
 //        setSPSet("PatSet", mSet);
     }
 
-    private void loadItems() {
-        mSP = null;
-        mSP = getSharedPreferences("activity" + mActivityId, Context.MODE_PRIVATE);
-        mSet =  mSP.getStringSet("Items", mSet);
+    private void loadActivitys() {
+        mSet =  mSP.getStringSet("allactivitys", null);
         if (mSet != null) {
-            for (String item : mSet) {
-                String[] strs = item.split("\\#");
+            for (String activity : mSet) {
+                String[] strs = activity.split("\\#");
+                String members = Utils.getSPSet("Members", null, "activity"+strs[1], this).toString();
 //                Log.i(TAG, "loadItems: " + strs[0] + strs[1] + strs[2] + strs[3] + strs[4]);
-                Item item1 = new Item(strs[0], strs[2], strs[3], strs[4], strs[5]);
-                myDataset.add(item1);
+                Activity activity1 = new Activity(strs[0], members, "null", "null", "null");
+                myDataset.add(activity1);
             }
         }
     }
@@ -168,24 +167,24 @@ public class ViewActionItemActivity extends AppCompatActivity {
         setSPSet("Items", mSet);
     }
 
-    class Item {
-        public String mItemName;
+    class Activity {
+        public String mActivityName;
+        public String mCreater;
+        public String mLocal;
+        public String mCreateDate;
         public String mMembers;
-        public String mPayMan;
-        public String mTotal;
-        public String mAverage;
-        Item (String actionName, String members, String payMan, String total, String average) {
-            mItemName = actionName;
+        Activity (String actionName, String members, String local, String total, String creater) {
+            mActivityName = actionName;
+            mCreater = creater;
+            mLocal = local;
+            mCreateDate = total;
             mMembers = members;
-            mPayMan = payMan;
-            mTotal = total;
-            mAverage = average;
         }
     }
 
 
-    public void deleteItem(String name) {
-        mAdapter.deleteItem(name);
+    public void deleteActivity(String name) {
+        mAdapter.deleteActivity(name);
         commit(name);
     }
 
@@ -194,30 +193,30 @@ public class ViewActionItemActivity extends AppCompatActivity {
     // you provide access to all the views for a data item in a view holder
     public class ViewHolder extends RecyclerView.ViewHolder {
         // each data item is just a string in this case
-        public TextView mItemName;
-        public TextView mMembers;
-        public TextView mPayMan;
-        public TextView mTotal;
-        public TextView mAverage;
+        public TextView mActivityNameView;
+        public TextView mCreaterView;
+        public TextView mMembersView;
+        public TextView mCreateDateView;
+        public TextView mCreateLocalView;
         public Button mDelete;
         public Button mEdit;
 
         public ViewHolder(View v) {
             super(v);
 
-            mPayMan = (TextView) v.findViewById(R.id.cteate_time);
-            mItemName = (TextView) v.findViewById(R.id.action_name);
-            mMembers = (TextView) v.findViewById(R.id.members);
-            mTotal = (TextView) v.findViewById(R.id.create_date);
-            mAverage = (TextView) v.findViewById(R.id.average);
+            mMembersView = (TextView) v.findViewById(R.id.members);
+            mActivityNameView = (TextView) v.findViewById(R.id.action_name);
+            mCreaterView = (TextView) v.findViewById(R.id.creater);
+            mCreateDateView = (TextView) v.findViewById(R.id.create_date);
+            mCreateLocalView = (TextView) v.findViewById(R.id.create_local);
             mDelete = (Button) v.findViewById(R.id.button7);
             mEdit = (Button) v.findViewById(R.id.button8);
 
             mDelete.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (!("".equals(mItemName.getText().toString()))) {
-                            deleteItem(mItemName.getText().toString());
+                    if (!("".equals(mActivityNameView.getText().toString()))) {
+                            deleteActivity(mActivityNameView.getText().toString());
                     }
                 }
             });
@@ -225,8 +224,8 @@ public class ViewActionItemActivity extends AppCompatActivity {
             mEdit.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (!("".equals(mItemName.getText().toString()))) {
-                        editItem(mItemName.getText().toString());
+                    if (!("".equals(mActivityNameView.getText().toString()))) {
+                        editActivity(mActivityNameView.getText().toString()/*.split("\\:")[1]*/);
                     }
                 }
             });
@@ -234,27 +233,27 @@ public class ViewActionItemActivity extends AppCompatActivity {
         }
     }
 
-    private void editItem(String itemName) {
-        Intent intent = new Intent(this, CreateActionItemActivity.class);
-        intent.putExtra("itemName", itemName);
-        intent.putExtra("activityId", mActivityId);
+    private void editActivity(String activityName) {
+        Intent intent = new Intent(this, ViewActionItemActivity.class);
+//        intent.putExtra("itemName", itemName);
+        intent.putExtra("activityId", ""+Utils.getIdFromActivityName(this, activityName));
         startActivity(intent);
     }
 
     public class MyAdapter extends RecyclerView.Adapter<ViewHolder> {
         private final int mBackground;
-        private List<Item> mDataset;
+        private List<Activity> mDataset;
         private final TypedValue mTypedValue = new TypedValue();
 
         // Provide a suitable constructor (depends on the kind of dataset)
-        public MyAdapter(Context context, List<Item> myDataset) {
+        public MyAdapter(Context context, List<Activity> myDataset) {
             mDataset = myDataset;
             mHolder = new ArrayList<>();
             context.getTheme().resolveAttribute(R.attr.selectableItemBackground, mTypedValue, true);
             mBackground = mTypedValue.resourceId;
         }
 
-        public List<Item> getPeoples() {
+        public List<Activity> getPeoples() {
             return mDataset;
         }
 
@@ -265,14 +264,14 @@ public class ViewActionItemActivity extends AppCompatActivity {
         }
 
 
-        private void deleteItem(String name) {
-            for (Item p:mDataset) {
-                if (p.mItemName.equals(name)) {
-                    mDataset.remove(p);
-                    break;
-                }
-            }
-            this.notifyDataSetChanged();
+        private void deleteActivity(String name) {
+//            for (Activity p:mDataset) {
+//                if (p.mActivityName.equals(name)) {
+//                    mDataset.remove(p);
+//                    break;
+//                }
+//            }
+//            this.notifyDataSetChanged();
         }
 
         @Override
@@ -281,7 +280,7 @@ public class ViewActionItemActivity extends AppCompatActivity {
             // create a new view
 //            isHost = true;
             View v = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.item_view_action_item, parent, false);
+                    .inflate(R.layout.item_view_all_action, parent, false);
 //            isHost = false;
             v.setBackgroundResource(mBackground);
             // set the view's size, margins, paddings and layout parameters
@@ -294,13 +293,13 @@ public class ViewActionItemActivity extends AppCompatActivity {
         public void onBindViewHolder(ViewHolder holder, int position) {
             // - get element from your dataset at this position
             // - replace the contents of the view with that element
-            Item pat = mDataset.get(position);
+            Activity pat = mDataset.get(position);
 //            holder.mTextView.setText(pat.patName);
-            holder.mItemName.setText(pat.mItemName);
-            holder.mAverage.setText(pat.mAverage);
-            holder.mMembers.setText(pat.mMembers);
-            holder.mTotal.setText(pat.mTotal);
-            holder.mPayMan.setText(pat.mPayMan);
+            holder.mActivityNameView.setText(pat.mActivityName);
+            holder.mCreateLocalView.setText(pat.mMembers);
+            holder.mCreaterView.setText(pat.mCreater);
+            holder.mCreateDateView.setText(pat.mCreateDate);
+            holder.mMembersView.setText(pat.mLocal);
             Log.i(TAG, "onBindViewHolder: THQ");
         }
 
@@ -318,19 +317,14 @@ public class ViewActionItemActivity extends AppCompatActivity {
     };
 
 
-    public void createActionItem(View view) {
-        if ( mSP.getStringSet("Members", null) != null) {
-            Intent intent = new Intent(ViewActionItemActivity.this, CreateActionItemActivity.class);
-            intent.putExtra("activityId", mActivityId);
-            startActivity(intent);
-        } else {
-            Toast.makeText(this, "请先创建活动", Toast.LENGTH_SHORT).show();
-        }
+    public void createAction(View view) {
+        Intent intent = new Intent(this, CreateActionActivity.class);
+        startActivity(intent);
     }
 
     public void getBill(View view) {
         if ( mSP.getStringSet("Members", null) != null) {
-            Intent intent = new Intent(ViewActionItemActivity.this, ViewBillActivity.class);
+            Intent intent = new Intent(ViewAllActionActivity.this, ViewBillActivity.class);
             intent.putExtra("activityId", mActivityId);
             startActivity(intent);
         } else {

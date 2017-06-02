@@ -43,19 +43,26 @@ public class ViewBillActivity extends AppCompatActivity {
 
     SharedPreferences mSP;
     SharedPreferences.Editor mEditor;
+    String mActivityFileName = null;
+    String mActivityId = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_member_bill);
 
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            mActivityId = extras.getString("activityId");
+        }
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         mToolbar.setTitle(R.string.app_name_view_bill);
 
+        mActivityFileName = "activity" + mActivityId;
 
-        mSP = getSharedPreferences("data", Context.MODE_PRIVATE);
+        mSP = getSharedPreferences(mActivityFileName, Context.MODE_PRIVATE);
         mEditor = mSP.edit();
 
         //RecyclerView
@@ -226,7 +233,7 @@ public class ViewBillActivity extends AppCompatActivity {
             mName = (TextView) v.findViewById(R.id.member_name);
             mJoindItem = (TextView) v.findViewById(R.id.joined_item);
             mCost = (TextView) v.findViewById(R.id.cost);
-            mTotal = (TextView) v.findViewById(R.id.total);
+            mTotal = (TextView) v.findViewById(R.id.create_date);
             mPay = (TextView) v.findViewById(R.id.pay);
 
         }

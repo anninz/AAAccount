@@ -31,6 +31,7 @@ public class CreateActionItemActivity extends AppCompatActivity {
     private LinearLayoutManager mLayoutManager;
     private List<Item> myDataset;
     private Set<String> mMemberSet;
+    private Set<String> mActivitySet;
     private Set<String> mItemsSet;
 
 
@@ -50,6 +51,8 @@ public class CreateActionItemActivity extends AppCompatActivity {
     TextView mPayerView;
 
     boolean mIsEditMode = false;
+    String mActivityFileName = null;
+    String mActivityId = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -58,8 +61,10 @@ public class CreateActionItemActivity extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
         String itemName = null;
+        String activityId = null;
         if (extras != null) {
             itemName = extras.getString("itemName");
+            activityId = extras.getString("activityId");
         }
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -71,37 +76,64 @@ public class CreateActionItemActivity extends AppCompatActivity {
             mToolbar.setTitle(R.string.app_name_edit_item);
         }
 
-        mTotalView = (TextView) findViewById(R.id.total);
-        mItemNameView = (TextView) findViewById(R.id.item_name);
+        mTotalView = (TextView) findViewById(R.id.create_date);
+        mItemNameView = (TextView) findViewById(R.id.action_name);
         mActionNameView = (TextView) findViewById(R.id.belong_action);
         mAverageView = (TextView) findViewById(R.id.average);
-        mPayerView = (TextView) findViewById(R.id.payer);
+        mPayerView = (TextView) findViewById(R.id.cteate_time);
         mSelectedMembersView = (TextView) findViewById(R.id.members);
 
         mPayerView.addTextChangedListener(textWatcher);
         mTotalView.addTextChangedListener(textWatcher);
 
-        mSP = getSharedPreferences("data", Context.MODE_PRIVATE);
+        mActivityId = activityId == null? String.valueOf(Utils.getLastestActivityId(this)):activityId;
+
+        mActivityFileName = "activity" + mActivityId;
+
+        mSP = getSharedPreferences(mActivityFileName, Context.MODE_PRIVATE);
         mEditor = mSP.edit();
+
+//        mActions[0] = mSP.getString("ActionName", null);
+        mActivitySet = Utils.getAllActivity(this);
+        mActions = new String[mActivitySet.size()];
+        int i1 = 0;
+        for (String s:mActivitySet) {
+            mActions[i1++] = s.split("\\#")[0];
+        }
+//        mActions = mActivitySet.toArray(mActions);
 
         mItemsSet = mSP.getStringSet("Items", mItemsSet);
         mMemberSet = mSP.getStringSet("Members", mMemberSet);
         mMembers = new String[mMemberSet.size()];
         mMembers = mMemberSet.toArray(mMembers);
-        mActions = new String[1];
-        mActions[0] = mSP.getString("ActionName", null);
-
         mMembersToDialog = new String[mMembers.length + 1];
         mMembersToDialog[mMembers.length] = "全选";
         for (int i = 0;i < mMembers.length; i++) {
             mMembersToDialog[i] = mMembers[i];
         }
 
-        mActionNameView.setText("所属活动:" + mActions[0]);
+        mActionNameView.setText("所属活动:" + mSP.getString("ActionName", null));
         if (mIsEditMode) {
             loadItemsToView(itemName);
         }
 
+    }
+
+    private void reloadData() {
+        if (mItemsSet != null)mItemsSet.clear();
+        mMemberSet.clear();
+        SharedPreferences mSP = getSharedPreferences(mActivityFileName, Context.MODE_PRIVATE);
+//        mEditor = mSP.edit();
+
+        mMemberSet = mSP.getStringSet("Members", null);
+        mItemsSet = mSP.getStringSet("Items", null);
+        mMembers = new String[mMemberSet.size()];
+        mMembers = mMemberSet.toArray(mMembers);
+        mMembersToDialog = new String[mMembers.length + 1];
+        mMembersToDialog[mMembers.length] = "全选";
+        for (int i = 0;i < mMembers.length; i++) {
+            mMembersToDialog[i] = mMembers[i];
+        }
     }
 
     private void loadItemsToView(String key) {
@@ -156,21 +188,21 @@ public class CreateActionItemActivity extends AppCompatActivity {
     }
 
     private void setSPString(String key, String value) {
-        SharedPreferences sp = getSharedPreferences("data", Context.MODE_PRIVATE);
+        SharedPreferences sp = getSharedPreferences(mActivityFileName, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
         editor.putString(key, value);
         editor.commit();
     }
 
     private void setSPInt(String key, int value) {
-        SharedPreferences sp = getSharedPreferences("data", Context.MODE_PRIVATE);
+        SharedPreferences sp = getSharedPreferences(mActivityFileName, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
         editor.putInt(key, value);
         editor.commit();
     }
 
     private void setSPSet(String key, Set<String> value) {
-        SharedPreferences sp = getSharedPreferences("data", Context.MODE_PRIVATE);
+        SharedPreferences sp = getSharedPreferences(mActivityFileName, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
         editor.putStringSet(key, value);
         editor.commit();
@@ -229,7 +261,7 @@ public class CreateActionItemActivity extends AppCompatActivity {
             public void onClick(DialogInterface arg0, int arg1) {
                 //TODO 业务逻辑代码
 
-                ((TextView)view).setText("付款人:" + mMembers[selectedActionIndex]);
+                ((TextView)view).setText("付款人:" + mMembers[mSelectedActionIndex]);
                 // 关闭提示框
                 alertDialog2.dismiss();
             }
@@ -248,7 +280,8 @@ public class CreateActionItemActivity extends AppCompatActivity {
         alertDialog2.show();
     }
 
-    int selectedActionIndex = 0;
+    int mSelectedActionIndex = -1;
+    int mOldSelectedActionIndex = 0;
     // 单选提示框
     private AlertDialog alertDialog4;
     public void showActionsAlertDialog(final View view){
@@ -260,8 +293,7 @@ public class CreateActionItemActivity extends AppCompatActivity {
 
             @Override
             public void onClick(DialogInterface arg0, int index) {
-                selectedActionIndex = index;
-                Toast.makeText(CreateActionItemActivity.this, mActions[index], Toast.LENGTH_SHORT).show();
+                mSelectedActionIndex = index;
             }
         });
         alertBuilder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
@@ -270,7 +302,13 @@ public class CreateActionItemActivity extends AppCompatActivity {
             public void onClick(DialogInterface arg0, int arg1) {
                 //TODO 业务逻辑代码
 
-                ((TextView)view).setText("所属活动:" + mActions[selectedActionIndex]);
+                ((TextView)view).setText("所属活动:" + mActions[mSelectedActionIndex]);
+                if (mSelectedActionIndex != -1 && mSelectedActionIndex != mOldSelectedActionIndex) {
+//                    mOldSelectedActionIndex = mSelectedActionIndex;
+//                    mActivityFileName = "activity" + Utils.getIdFromActivityName(CreateActionItemActivity.this, mActions[mSelectedActionIndex]);
+//                    Toast.makeText(CreateActionItemActivity.this, "已切换到" +mActivityFileName, Toast.LENGTH_SHORT).show();
+//                    reloadData();
+                }
                 // 关闭提示框
                 alertDialog4.dismiss();
             }

@@ -18,21 +18,20 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/child_view_margin"
             android:layout_marginRight="@dimen/child_view_margin"
-            android:onClick="createActionItem"
+            android:onClick="createAction"
             android:id="@+id/add_action"
             android:layout_weight="1"
             />
 
-        <Button
+<!--        <Button
             android:text="Get Bill"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/child_view_margin"
             android:layout_marginRight="@dimen/child_view_margin"
-            android:onClick="getBill"
             android:id="@+id/get_bill"
             android:layout_weight="1"
-            />
+            />-->
     </LinearLayout>
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerView"

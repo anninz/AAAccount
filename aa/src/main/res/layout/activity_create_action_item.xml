@@ -21,7 +21,7 @@
         >
 
         <EditText
-            android:id="@+id/item_name"
+            android:id="@+id/action_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/item_name"
@@ -36,7 +36,6 @@
         android:gravity="center_vertical"
         android:id="@+id/belong_action"
         android:layout_marginLeft="@dimen/child_view_margin"
-        android:onClick="showActionsAlertDialog"
          />
 
     <TextView
@@ -56,7 +55,7 @@
         android:layout_height="50dp"
         android:gravity="center_vertical"
         android:layout_marginLeft="@dimen/child_view_margin"
-        android:id="@+id/payer"
+        android:id="@+id/cteate_time"
         android:onClick="showPayManAlertDialog"
          />
 
@@ -75,7 +74,7 @@
             >
 
             <EditText
-                android:id="@+id/total"
+                android:id="@+id/create_date"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/item_cost"
