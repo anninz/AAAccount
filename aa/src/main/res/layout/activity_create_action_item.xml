@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    >
+
+
+    <include
+        android:id="@+id/appbar"
+        layout="@layout/include_toolbar" />
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/textInputPatNum"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/default_corner_radius"
+        android:layout_marginLeft="@dimen/child_view_margin"
+        android:layout_marginRight="@dimen/child_view_margin"
+        >
+
+        <EditText
+            android:id="@+id/item_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/item_name"
+            />
+    </android.support.design.widget.TextInputLayout>
+
+
+    <TextView
+        android:text="Action Name"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:gravity="center_vertical"
+        android:id="@+id/belong_action"
+        android:layout_marginLeft="@dimen/child_view_margin"
+        android:onClick="showActionsAlertDialog"
+         />
+
+    <TextView
+        android:text="members"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:gravity="center_vertical"
+        android:id="@+id/members"
+        android:layout_marginLeft="@dimen/child_view_margin"
+        android:onClick="showMembersAlertDialog"
+         />
+
+
+    <TextView
+        android:text="payer"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:gravity="center_vertical"
+        android:layout_marginLeft="@dimen/child_view_margin"
+        android:id="@+id/payer"
+        android:onClick="showPayManAlertDialog"
+         />
+
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/textInputPatNum4"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/child_view_margin"
+            android:layout_marginRight="@dimen/child_view_margin"
+            >
+
+            <EditText
+                android:id="@+id/total"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/item_cost"
+                android:inputType="phone"
+                />
+        </android.support.design.widget.TextInputLayout>
+
+        <TextView
+            android:text="average"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:gravity="bottom"
+            android:layout_marginLeft="@dimen/child_view_margin"
+            android:onClick="getAverage"
+            android:id="@+id/average"
+             />
+
+    </LinearLayout>
+
+    <Button
+        android:text="DONE"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/child_view_margin"
+        android:layout_marginLeft="@dimen/child_view_margin"
+        android:layout_marginRight="@dimen/child_view_margin"
+        android:onClick="commit"
+        android:id="@+id/button5"
+         />
+
+    <TextView
+        android:text="@string/item_page_hint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/child_view_margin_top"
+        android:layout_marginLeft="@dimen/child_view_margin"
+        android:layout_marginRight="@dimen/child_view_margin"
+        android:id="@+id/textView" />
+
+</LinearLayout>

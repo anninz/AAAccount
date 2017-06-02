@@ -1,0 +1,47 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:cube_ptr="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <include
+        android:id="@+id/appbar"
+        layout="@layout/include_toolbar" />
+    <LinearLayout
+        android:id="@+id/button_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/child_view_margin_top"
+        >
+        <Button
+            android:text="create item"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/child_view_margin"
+            android:layout_marginRight="@dimen/child_view_margin"
+            android:onClick="createActionItem"
+            android:id="@+id/add_action"
+            android:layout_weight="1"
+            />
+
+        <Button
+            android:text="Get Bill"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/child_view_margin"
+            android:layout_marginRight="@dimen/child_view_margin"
+            android:onClick="getBill"
+            android:id="@+id/get_bill"
+            android:layout_weight="1"
+            />
+    </LinearLayout>
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_below="@+id/button_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/child_view_margin"
+        android:scrollbars="none"
+        android:background="@color/light_grey"
+        />
+
+</RelativeLayout>

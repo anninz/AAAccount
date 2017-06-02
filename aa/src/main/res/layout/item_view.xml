@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="80dp"
+    android:layout_marginLeft="6dp"
+    android:layout_marginRight="6dp"
+    android:clickable="true"
+    android:background="@drawable/news_item"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    >
+
+    <ImageView
+        android:id="@+id/menber_image"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="6dp"
+        android:layout_marginRight="6dp"
+        android:transitionName="@string/app_name"
+        android:src="@mipmap/ic_launcher"
+        />
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/textInputPatNum"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/child_view_margin"
+        android:layout_marginRight="@dimen/child_view_margin"
+        >
+
+        <EditText
+            android:id="@+id/menber_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/people_name"
+             />
+    </android.support.design.widget.TextInputLayout>
+
+    <Button
+        android:text="+"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/add_menber"
+        />
+    <!--<EditText-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:id="@+id/pat_num"-->
+        <!--android:layout_weight="2"-->
+        <!--android:padding="6dp"-->
+        <!--android:layout_margin="10dp"-->
+        <!--android:hint="0～5只"-->
+        <!--android:inputType="number"-->
+        <!--/>-->
+    <!--<Spinner-->
+        <!--android:id="@+id/spinner1"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginRight="10dp"-->
+        <!--android:spinnerMode="dialog"-->
+        <!--android:layout_toLeftOf="@+id/checkbox"-->
+        <!--/>-->
+    <!--<CheckBox-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginRight="6dp"-->
+        <!--android:id="@+id/checkbox"-->
+        <!--android:layout_alignParentRight="true"/>-->
+</LinearLayout>

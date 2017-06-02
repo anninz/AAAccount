@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">AA</string>
+    <string name="app_name_create_action">创建活动</string>
+    <string name="app_name_create_item">创建活动项</string>
+    <string name="app_name_edit_item">编辑活动项</string>
+    <string name="app_name_view_action">查看活动</string>
+    <string name="app_name_view_item">活动项</string>
+    <string name="app_name_view_bill">消费明细</string>
+    <string name="action_name">action name</string>
+    <string name="people_name">member name</string>
+    <string name="item_cost">total cost</string>
+    <string name="item_name">item name</string>
+    <string name="item_page_hint">注:\n没有输入框的项，请点击文字进行操作；payer>1时total cost按payer顺序输入现金数，并以"+"隔开。</string>
+</resources>
