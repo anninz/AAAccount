@@ -13,6 +13,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -52,6 +53,7 @@ public class CreateActionItemActivity extends AppCompatActivity {
 
     boolean mIsEditMode = false;
     String mActivityFileName = null;
+    String mActivityName = null;
     String mActivityId = null;
 
     @Override
@@ -86,7 +88,7 @@ public class CreateActionItemActivity extends AppCompatActivity {
         mPayerView.addTextChangedListener(textWatcher);
         mTotalView.addTextChangedListener(textWatcher);
 
-        mActivityId = activityId == null? String.valueOf(Utils.getLastestActivityId(this)):activityId;
+        mActivityId = activityId == null? String.valueOf(Utils.getLastestActivityId()):activityId;
 
         mActivityFileName = "activity" + mActivityId;
 
@@ -94,16 +96,21 @@ public class CreateActionItemActivity extends AppCompatActivity {
         mEditor = mSP.edit();
 
 //        mActions[0] = mSP.getString("ActionName", null);
-        mActivitySet = Utils.getAllActivity(this);
+        mActivitySet = Utils.getAllActivity();
         mActions = new String[mActivitySet.size()];
+
+        mActivityName = mSP.getString("ActionName", null);
+
         int i1 = 0;
         for (String s:mActivitySet) {
-            mActions[i1++] = s.split("\\#")[0];
+            mActions[i1] = s.split("\\#")[0];
+            if (mActions[i1].equals(mActivityName)) mOldSelectedActionIndex = i1;
+            i1++;
         }
 //        mActions = mActivitySet.toArray(mActions);
 
-        mItemsSet = mSP.getStringSet("Items", mItemsSet);
-        mMemberSet = mSP.getStringSet("Members", mMemberSet);
+        mItemsSet = mSP.getStringSet("Items", null);
+        mMemberSet = mSP.getStringSet("Members", null);
         mMembers = new String[mMemberSet.size()];
         mMembers = mMemberSet.toArray(mMembers);
         mMembersToDialog = new String[mMembers.length + 1];
@@ -112,7 +119,7 @@ public class CreateActionItemActivity extends AppCompatActivity {
             mMembersToDialog[i] = mMembers[i];
         }
 
-        mActionNameView.setText("所属活动:" + mSP.getString("ActionName", null));
+        mActionNameView.setText("所属活动:" + mActivityName);
         if (mIsEditMode) {
             loadItemsToView(itemName);
         }
@@ -120,8 +127,8 @@ public class CreateActionItemActivity extends AppCompatActivity {
     }
 
     private void reloadData() {
-        if (mItemsSet != null)mItemsSet.clear();
-        mMemberSet.clear();
+        mItemsSet = null;
+        mMemberSet = null;
         SharedPreferences mSP = getSharedPreferences(mActivityFileName, Context.MODE_PRIVATE);
 //        mEditor = mSP.edit();
 
@@ -134,18 +141,20 @@ public class CreateActionItemActivity extends AppCompatActivity {
         for (int i = 0;i < mMembers.length; i++) {
             mMembersToDialog[i] = mMembers[i];
         }
+        mPayerView.setText("payer");
+        mSelectedMembersView.setText("members");
     }
 
+    String selectedItem = null;
     private void loadItemsToView(String key) {
         if (mItemsSet != null) {
-            String selectedItem = null;
             for (String item : mItemsSet) {
                 if (item.contains(key)) {
                     selectedItem = item;
                     String[] strs = item.split("\\#");
                     mItemNameView.setText(strs[0].split("\\:")[1]);
                     mSelectedMembersView.setText(strs[2]);
-                    mSelectedMembersViewNum = strs[2].split("\\,").length;
+                    mSelectedMembersNum = strs[2].split("\\,").length;
                     mPayerView.setText(strs[3]);
                     mTotalView.setText(strs[4].split("\\:")[1]);
                     mAverageView.setText(strs[5]);
@@ -153,7 +162,6 @@ public class CreateActionItemActivity extends AppCompatActivity {
                     break;
                 }
             }
-            mItemsSet.remove(selectedItem);
         }
     }
 
@@ -223,6 +231,27 @@ public class CreateActionItemActivity extends AppCompatActivity {
         }
     }
 
+
+    public void showAlertDialog(){
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setTitle("警告");
+        alertDialogBuilder.setIcon(android.R.drawable.ic_dialog_dialer);
+        alertDialogBuilder.setMessage("切换后将重置本页面，确定要切换吗？");
+        alertDialogBuilder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface arg0, int arg1) {
+                reloadData();
+            }
+        });
+        alertDialogBuilder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface arg0, int arg1) {
+            }
+        });
+        alertDialogBuilder.show();
+    }
+
     // 信息列表提示框
     private AlertDialog alertDialog1;
     public void showListAlertDialog(View view){
@@ -281,7 +310,7 @@ public class CreateActionItemActivity extends AppCompatActivity {
     }
 
     int mSelectedActionIndex = -1;
-    int mOldSelectedActionIndex = 0;
+    int mOldSelectedActionIndex = -1;
     // 单选提示框
     private AlertDialog alertDialog4;
     public void showActionsAlertDialog(final View view){
@@ -304,10 +333,10 @@ public class CreateActionItemActivity extends AppCompatActivity {
 
                 ((TextView)view).setText("所属活动:" + mActions[mSelectedActionIndex]);
                 if (mSelectedActionIndex != -1 && mSelectedActionIndex != mOldSelectedActionIndex) {
-//                    mOldSelectedActionIndex = mSelectedActionIndex;
-//                    mActivityFileName = "activity" + Utils.getIdFromActivityName(CreateActionItemActivity.this, mActions[mSelectedActionIndex]);
+                    mOldSelectedActionIndex = mSelectedActionIndex;
+                    mActivityFileName = "activity" + Utils.getIdFromActivityName(mActions[mSelectedActionIndex]);
 //                    Toast.makeText(CreateActionItemActivity.this, "已切换到" +mActivityFileName, Toast.LENGTH_SHORT).show();
-//                    reloadData();
+                    showAlertDialog();
                 }
                 // 关闭提示框
                 alertDialog4.dismiss();
@@ -325,6 +354,7 @@ public class CreateActionItemActivity extends AppCompatActivity {
         });
         alertDialog4 = alertBuilder.create();
         alertDialog4.show();
+        alertDialog4.getListView().setItemChecked(mOldSelectedActionIndex,true);
     }
 
 
@@ -335,14 +365,14 @@ public class CreateActionItemActivity extends AppCompatActivity {
         selectedMemberIndex.add(index);
     }
     private void unselectMember(int value) {
-        int index = selectedPayManIndex.indexOf(value);
-        selectedPayManIndex.remove(index);
+        int index = selectedMemberIndex.indexOf(value);
+        selectedMemberIndex.remove(index);
     }
 
 
     String[] mMembersToDialog;
     boolean selectedAll = false;
-    int mSelectedMembersViewNum = 0;
+    int mSelectedMembersNum = 0;
     // 多选提示框
     private AlertDialog alertDialog3;
     public void showMembersAlertDialog(final View view){
@@ -366,6 +396,7 @@ public class CreateActionItemActivity extends AppCompatActivity {
                     // 选中
                     if (which == mMembersToDialog.length -1) {
                         selectedAll = true;
+                        selectAll(alertDialog3, true);
                     } else {
                         selectMember(which);
 //                        Toast.makeText(CreateActionItemActivity.this, "选中"+ mMembers[which], Toast.LENGTH_SHORT).show();
@@ -374,6 +405,7 @@ public class CreateActionItemActivity extends AppCompatActivity {
                     // 取消选中
                     if (which == mMembersToDialog.length -1) {
                         selectedAll = false;
+                        selectAll(alertDialog3, false);
                     } else {
                         unselectMember(which);
 //                        Toast.makeText(CreateActionItemActivity.this, "取消选中"+ mMembers[which], Toast.LENGTH_SHORT).show();
@@ -396,14 +428,14 @@ public class CreateActionItemActivity extends AppCompatActivity {
                     for (String s:mMembers) {
                         mSelectedMenbers.append(s + ",");
                     }
-                    mSelectedMembersViewNum = mMembers.length;
+                    selectedAll = false;
+                    mSelectedMembersNum = mMembers.length;
                 } else {
                     for (Integer i : selectedMemberIndex) {
                         mSelectedMenbers.append(mMembers[i] + ",");
                     }
-                    mSelectedMembersViewNum = selectedMemberIndex.size();
+                    mSelectedMembersNum = selectedMemberIndex.size();
                 }
-                selectedPayManIndex.clear();
                 ((TextView)view).setText("参与人:" + mSelectedMenbers);
                 // 关闭提示框
                 alertDialog3.dismiss();
@@ -421,6 +453,12 @@ public class CreateActionItemActivity extends AppCompatActivity {
         });
         alertDialog3 = alertDialogBuilder.create();
         alertDialog3.show();
+
+        ListView listView = alertDialog3.getListView();
+        for (Integer i : selectedMemberIndex) {
+            listView.setItemChecked(i, true);
+        }
+//        selectedMemberIndex.clear();
     }
 
 
@@ -471,7 +509,6 @@ public class CreateActionItemActivity extends AppCompatActivity {
                 for (Integer i:selectedPayManIndex) {
                     mSelectedMenbers.append(mMembers[i] + ",");
                 }
-                selectedPayManIndex.clear();
                 ((TextView)view).setText("付款人:" + mSelectedMenbers);
                 // 关闭提示框
 //                resetAverageView();
@@ -490,8 +527,23 @@ public class CreateActionItemActivity extends AppCompatActivity {
         });
         alertDialog6 = alertDialogBuilder.create();
         alertDialog6.show();
+
+        ListView listView = alertDialog6.getListView();
+        for (Integer i : selectedPayManIndex) {
+            listView.setItemChecked(i, true);
+        }
+//        selectedPayManIndex.clear();
     }
 
+
+    private void selectAll(AlertDialog alertDialog, boolean all) {
+        ListView listView = alertDialog.getListView();
+        selectedMemberIndex.clear();
+        for (int i = 0; i < listView.getCount() -1; i++) {
+            if (all)selectedMemberIndex.add(i);
+            listView.setItemChecked(i, all);
+        }
+    }
 
     private TextWatcher textWatcher = new TextWatcher() {
 
@@ -523,7 +575,7 @@ public class CreateActionItemActivity extends AppCompatActivity {
     public void getAverage(View view) {
         String totalCost = mTotalView.getText().toString();
         String payer = mPayerView.getText().toString();
-        if (totalCost.equals("") || mSelectedMembersViewNum == 0 || !payer.contains(":")) {
+        if (totalCost.equals("") || mSelectedMembersNum == 0 || !payer.contains(":")) {
             Toast.makeText(CreateActionItemActivity.this, "请确定已输入成员，付款人和总花费！", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -547,7 +599,7 @@ public class CreateActionItemActivity extends AppCompatActivity {
             Toast.makeText(CreateActionItemActivity.this, "请确保总花费格式填写正确！", Toast.LENGTH_SHORT).show();
             return;
         }
-        ((TextView)view).setText("人均:" + ((float)total/mSelectedMembersViewNum));
+        ((TextView)view).setText("人均:" + ((float)total/ mSelectedMembersNum));
     }
 
     public void commit(View view) {
@@ -565,6 +617,7 @@ public class CreateActionItemActivity extends AppCompatActivity {
         if (mItemsSet == null) mItemsSet = new HashSet<>();
 //        Set<String> mtemsSet = new HashSet<>();
 
+        mItemsSet.remove(selectedItem);
             Log.i(TAG, "commit: THQ1 " + mItemsSet.size());
         mItemsSet.add(/*String.valueOf(mItemsSet.size())+*/"消费项:" + mItemNameView.getText().toString() + "#" + mActionNameView.getText().toString()
                 + "#" + mSelectedMembersView.getText().toString() + "#" + mPayerView.getText().toString()

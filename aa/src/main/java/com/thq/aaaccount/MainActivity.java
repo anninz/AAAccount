@@ -26,8 +26,8 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(mToolbar);
         mToolbar.setTitle(R.string.app_name);
 
-        if (Utils.getLastestActivityId(this) < 0) {
-            Utils.setSPInt("activitynums", 0, "allactivity", this);
+        if (Utils.getLastestActivityId() < 0) {
+            Utils.setSPInt("activitynums", 0, "allactivity");
         }
     }
 
@@ -43,9 +43,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void gotoAction(View view) {
-        if (Utils.getLastestActivityId(this) > 0) {
+        if (Utils.getLastestActivityId() > 0) {
             Intent intent = new Intent(MainActivity.this, ViewActionItemActivity.class);
-            intent.putExtra("activityId", "" + Utils.getLastestActivityId(this));
+            intent.putExtra("activityId", "" + Utils.getLastestActivityId());
             startActivity(intent);
         } else {
             Toast.makeText(this, "请先创建活动", Toast.LENGTH_SHORT).show();
@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void createActionItem(View view) {
-        if (Utils.getLastestActivityId(this) > 0) {
+        if (Utils.getLastestActivityId() > 0) {
             Intent intent = new Intent(MainActivity.this, CreateActionItemActivity.class);
 //            intent.putExtra("activityName", itemName);
             startActivity(intent);

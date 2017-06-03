@@ -1,9 +1,11 @@
 package com.thq.aaaccount;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -122,7 +124,7 @@ public class ViewAllActionActivity extends AppCompatActivity {
         if (mSet != null) {
             for (String activity : mSet) {
                 String[] strs = activity.split("\\#");
-                String members = Utils.getSPSet("Members", null, "activity"+strs[1], this).toString();
+                String members = Utils.getSPSet("Members", null, "activity"+strs[1]).toString();
 //                Log.i(TAG, "loadItems: " + strs[0] + strs[1] + strs[2] + strs[3] + strs[4]);
                 Activity activity1 = new Activity(strs[0], members, "null", "null", "null");
                 myDataset.add(activity1);
@@ -152,7 +154,8 @@ public class ViewAllActionActivity extends AppCompatActivity {
     }
 
     private void commit(String key) {
-        setSPSet("Items", null);
+//        String activityId = Utils.getIdFromActivityName(key);
+        Utils.setSPSet("allactivitys", null, "allactivity");
         if (mSet == null) mSet = new HashSet<>();
 //        Set<String> mtemsSet = new HashSet<>();
 
@@ -164,7 +167,7 @@ public class ViewAllActionActivity extends AppCompatActivity {
                 break;
             }
         }
-        setSPSet("Items", mSet);
+        Utils.setSPSet("allactivitys", mSet, "allactivity");
     }
 
     class Activity {
@@ -216,7 +219,8 @@ public class ViewAllActionActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     if (!("".equals(mActivityNameView.getText().toString()))) {
-                            deleteActivity(mActivityNameView.getText().toString());
+                        showAlertDialog(mActivityNameView.getText().toString());
+//                            deleteActivity(mActivityNameView.getText().toString());
                     }
                 }
             });
@@ -233,10 +237,41 @@ public class ViewAllActionActivity extends AppCompatActivity {
         }
     }
 
+    public void showAlertDialog(final String key){
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setTitle("警告");
+        alertDialogBuilder.setIcon(android.R.drawable.ic_dialog_dialer);
+        alertDialogBuilder.setMessage("删除后，所有该活动相关的信息都将消失，请确定要删除吗？");
+        alertDialogBuilder.setPositiveButton("删除", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface arg0, int arg1) {
+                deleteActivity(key);
+            }
+        });
+        alertDialogBuilder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface arg0, int arg1) {
+            }
+        });
+//        alertDialogBuilder.setNeutralButton("没感觉", new DialogInterface.OnClickListener() {
+//
+//            @Override
+//            public void onClick(DialogInterface arg0, int arg1) {
+//                Toast.makeText(ViewAllActionActivity.this, arg1 + "不讨厌也不喜欢", Toast.LENGTH_SHORT).show();
+//            }
+//        });
+        // 方式一
+        /*AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();*/
+        // 方式二
+        alertDialogBuilder.show();
+    }
+
     private void editActivity(String activityName) {
         Intent intent = new Intent(this, ViewActionItemActivity.class);
 //        intent.putExtra("itemName", itemName);
-        intent.putExtra("activityId", ""+Utils.getIdFromActivityName(this, activityName));
+        intent.putExtra("activityId", ""+Utils.getIdFromActivityName(activityName));
         startActivity(intent);
     }
 
@@ -265,13 +300,13 @@ public class ViewAllActionActivity extends AppCompatActivity {
 
 
         private void deleteActivity(String name) {
-//            for (Activity p:mDataset) {
-//                if (p.mActivityName.equals(name)) {
-//                    mDataset.remove(p);
-//                    break;
-//                }
-//            }
-//            this.notifyDataSetChanged();
+            for (Activity p:mDataset) {
+                if (p.mActivityName.equals(name)) {
+                    mDataset.remove(p);
+                    break;
+                }
+            }
+            this.notifyDataSetChanged();
         }
 
         @Override

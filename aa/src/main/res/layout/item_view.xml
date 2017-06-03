@@ -19,7 +19,7 @@
         android:layout_marginLeft="6dp"
         android:layout_marginRight="6dp"
         android:transitionName="@string/app_name"
-        android:src="@mipmap/ic_launcher"
+        android:src="@drawable/people"
         />
 
     <android.support.design.widget.TextInputLayout

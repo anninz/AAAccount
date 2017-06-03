@@ -61,8 +61,8 @@ public class ViewActionItemActivity extends AppCompatActivity {
         mToolbar.setTitle(R.string.app_name_view_item);
 
 
-        mSP = getSharedPreferences("activity" + mActivityId, Context.MODE_PRIVATE);
-        mEditor = mSP.edit();
+//        mSP = getSharedPreferences(mActivityFileName, Context.MODE_PRIVATE);
+//        mEditor = mSP.edit();
 
         //RecyclerView
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
@@ -118,9 +118,12 @@ public class ViewActionItemActivity extends AppCompatActivity {
     }
 
     private void loadItems() {
-        mSP = null;
-        mSP = getSharedPreferences("activity" + mActivityId, Context.MODE_PRIVATE);
-        mSet =  mSP.getStringSet("Items", mSet);
+//        mSP = null;
+//        mSP = getSharedPreferences("activity" + mActivityId, Context.MODE_PRIVATE);
+//        mSet = null;
+//        mSet = new HashSet<>();
+//        mSet =  mSP.getStringSet("Items", null);
+        mSet =  Utils.getSPSet("Items", null, mActivityFileName);
         if (mSet != null) {
             for (String item : mSet) {
                 String[] strs = item.split("\\#");
@@ -319,7 +322,7 @@ public class ViewActionItemActivity extends AppCompatActivity {
 
 
     public void createActionItem(View view) {
-        if ( mSP.getStringSet("Members", null) != null) {
+        if (Utils.getSPSet("Members", null, mActivityFileName) != null) {
             Intent intent = new Intent(ViewActionItemActivity.this, CreateActionItemActivity.class);
             intent.putExtra("activityId", mActivityId);
             startActivity(intent);
@@ -329,7 +332,7 @@ public class ViewActionItemActivity extends AppCompatActivity {
     }
 
     public void getBill(View view) {
-        if ( mSP.getStringSet("Members", null) != null) {
+        if (Utils.getSPSet("Members", null, mActivityFileName) != null) {
             Intent intent = new Intent(ViewActionItemActivity.this, ViewBillActivity.class);
             intent.putExtra("activityId", mActivityId);
             startActivity(intent);

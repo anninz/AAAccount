@@ -306,9 +306,9 @@ public class CreateActionActivity extends AppCompatActivity {
 
         if (mActivitySet == null) mActivitySet = new HashSet<>();
         mActivitySet.add(activityName+"#"+(activitynums+1));
-        Utils.setSPSet("allactivitys", null, "allactivity", this);
-        Utils.setSPSet("allactivitys", mActivitySet, "allactivity", this);
-        Utils.setSPInt("activitynums", activitynums+1, "allactivity", this);
+        Utils.setSPSet("allactivitys", null, "allactivity");
+        Utils.setSPSet("allactivitys", mActivitySet, "allactivity");
+        Utils.setSPInt("activitynums", activitynums+1, "allactivity");
 
 
 //        setSPString("ActionName", mActionNameView.getText().toString());
@@ -319,8 +319,8 @@ public class CreateActionActivity extends AppCompatActivity {
             }
         }
 
-        Utils.setSPString("ActionName", activityName, "activity"+(activitynums+1), this);
-        Utils.setSPSet("Members", mSet, "activity"+(activitynums+1), this);
+        Utils.setSPString("ActionName", activityName, "activity"+(activitynums+1));
+        Utils.setSPSet("Members", mSet, "activity"+(activitynums+1));
 //        setSPSet("Members", mSet);
         finish();
     }
