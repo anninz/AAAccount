@@ -5,6 +5,7 @@
 
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="child_view_margin">16dp</dimen>
+    <dimen name="child_view_margin_short">8dp</dimen>
     <dimen name="child_view_margin_top">66dp</dimen>
     <dimen name="child_view_margin_top_0">56dp</dimen>
     <dimen name="card_margin">5dp</dimen>

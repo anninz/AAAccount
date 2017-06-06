@@ -1,7 +1,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:cube_ptr="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/list_item">
 
     <include
         android:id="@+id/appbar"
@@ -11,8 +12,8 @@
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/child_view_margin_top"
-        android:layout_marginLeft="@dimen/child_view_margin"
-        android:layout_marginRight="@dimen/child_view_margin"
+        android:layout_marginLeft="@dimen/child_view_margin_short"
+        android:layout_marginRight="@dimen/child_view_margin_short"
         >
 
         <EditText
@@ -29,18 +30,62 @@
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/textInputPatNum"
         android:layout_toRightOf="@+id/textInputPatNum"
-        android:layout_marginRight="@dimen/child_view_margin"
+        android:layout_marginRight="@dimen/child_view_margin_short"
         android:onClick="createActionDone"
         android:id="@+id/add_action"
         />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/import_layout"
+        android:layout_below="@+id/textInputPatNum"
+        android:layout_marginTop="@dimen/child_view_margin_short"
+        android:layout_marginLeft="@dimen/child_view_margin_short"
+        android:layout_marginRight="@dimen/child_view_margin_short">
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/textInputHost"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="@dimen/child_view_margin_short"
+            >
+
+            <EditText
+                android:id="@+id/edit_text_host_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/prepaid"
+                android:inputType="numberSigned"
+                />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <TextView
+            android:text="import members"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/import_members"
+            android:textSize="18dp"
+            android:autoLink="all"
+            android:layout_gravity="bottom"
+            android:onClick="importMembers"
+            android:textColor="@color/google_yellow"
+            android:layout_marginBottom="@dimen/child_view_margin_short"
+            android:layout_weight="1" />
+
+
+    </LinearLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerView"
-        android:layout_below="@+id/textInputPatNum"
+        android:layout_below="@+id/import_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/child_view_margin"
+        android:layout_marginLeft="@dimen/child_view_margin_short"
+        android:layout_marginRight="@dimen/child_view_margin_short"
         android:scrollbars="none"
-        android:background="@color/light_grey"
+        android:background="@color/list_item"
         />
 
 </RelativeLayout>

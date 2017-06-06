@@ -3,13 +3,17 @@ package com.thq.aaaccount;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.support.annotation.IntegerRes;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -18,12 +22,14 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.thq.aaaccount.widget.DividerItemDecoration;
 import com.thq.aaaccount.widget.RecyclerItemClickListener;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -34,7 +40,7 @@ import java.util.Set;
 public class CreateActionActivity extends AppCompatActivity {
 
 
-    private static final String TAG = "THQ MainActivity";
+    private static final String TAG = "CreateActionActivity";
 
     private Toolbar mToolbar;
 
@@ -46,11 +52,26 @@ public class CreateActionActivity extends AppCompatActivity {
     private Set<String> mActivitySet;
     List<ViewHolder> mHolder;
 
+    private Set<String> mMemberSet;
+    List<String> mSelectedMembers;
+    String[] mMembers;
 
     SharedPreferences mActivitySP;
     SharedPreferences.Editor mActivityEditor;
 
     private EditText mActionNameView;
+    private EditText mPrepaid;
+
+    private float mHistoryPrepaid = -1;
+
+    private MultiAlertDialog mMultiAlertDialog;
+
+    boolean mIsEditMode = false;
+    String mActivityId = null;
+    String mActivityName = null;
+
+    int mYear, mMonth, mDay;
+    final int DATE_DIALOG = 1;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -58,15 +79,29 @@ public class CreateActionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_create_action);
 
 
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            mActivityName = extras.getString("activityName");
+            mActivityId = extras.getString("activityId");
+        }
+
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        if (mActivityName == null) {
+            mToolbar.setTitle(R.string.app_name_create_action);
+        } else {
+            mIsEditMode = true;
+            mToolbar.setTitle(R.string.app_name_edit_action);
+        }
         setSupportActionBar(mToolbar);
-        mToolbar.setTitle(R.string.app_name_create_action);
 
 
         mActivitySP = getSharedPreferences("allactivity", Context.MODE_PRIVATE);
         mActivityEditor = mActivitySP.edit();
 
         mActionNameView = (EditText) findViewById(R.id.edit_text_action_name);
+        mPrepaid = (EditText) findViewById(R.id.edit_text_host_name);
+        TextView textView = (TextView) findViewById(R.id.import_members);
+        textView.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG);
 
         //RecyclerView
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
@@ -83,34 +118,48 @@ public class CreateActionActivity extends AppCompatActivity {
 
         // specify an adapter (see also next example)
         myDataset = new ArrayList<>();
-        Member people = new Member("");
-        myDataset.add(people);
+        if (mIsEditMode) {
+            Set<String> set = Utils.getSPSet("Members", null, "activity" + mActivityId);
+            for (String str:set) {
+                String[] strs = str.split("\\#");
+                myDataset.add(new Member(strs[0], strs[1]));
+            }
+            mActionNameView.setText(mActivityName);
+        }
+        myDataset.add(new Member("", ""));
+
         mAdapter = new MyAdapter(this, myDataset);
         mRecyclerView.setAdapter(mAdapter);
+
+        mMultiAlertDialog = new MultiAlertDialog(this);
+//        mMemberSet = mSP.getStringSet("Members", null);
+
+        mSelectedMembers = new ArrayList<>();
+
+        initDatePicker();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mMemberSet = MemberDict.getIntance().getMembers(CreateActionActivity.this);
+                if (mMemberSet != null) {
+                    mMembers = new String[mMemberSet.size()];
+                    mMembers = mMemberSet.toArray(mMembers);
+                }
+            }
+        }).start();
+    }
+
+    private void initDatePicker() {
+        final Calendar ca = Calendar.getInstance();
+        mYear = ca.get(Calendar.YEAR);
+        mMonth = ca.get(Calendar.MONTH);
+        mDay = ca.get(Calendar.DAY_OF_MONTH);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-//        for (ViewHolder viewHolder:mHolder) {
-//            if (viewHolder.patNum > 0) {
-//                StringBuffer stringBuffer = new StringBuffer();
-//                stringBuffer.append(viewHolder.patNum + "#");
-//                stringBuffer.append(viewHolder.apkPath + "#");
-////                stringBuffer.append(viewHolder.mTextView.getText().toString());
-//                mSet.add(stringBuffer.toString());
-//            }
-/*
-            if (viewHolder.mCheckBox.isChecked()) {
-                StringBuffer stringBuffer = new StringBuffer();
-                stringBuffer.append(viewHolder.mEditText.getText().toString() + "#");
-                stringBuffer.append(viewHolder.apkPath + "#");
-                stringBuffer.append(viewHolder.mTextView.getText().toString());
-                mSet.add(stringBuffer.toString());
-            }
-*/
-//        }
-//        setSPSet("PatSet", mSet);
     }
 
     private void setSPString(String key, String value) {
@@ -136,19 +185,28 @@ public class CreateActionActivity extends AppCompatActivity {
 
     class Member {
         String mName;
+        String mPrepaid;
         Bitmap mIcon;
-        Member(String name) {
+        Member(String name, String prepaid) {
             mName = name;
+            mPrepaid = prepaid;
         }
     }
 
 
     public void addPeople(String name) {
+        if (mMemberSet == null || !mMemberSet.contains(name)) {
+            MemberDict.getIntance().addMember(this, name);
+        }
         mAdapter.addPeople(name);
     }
 
     public void deletePeople(String name) {
         mAdapter.deletePeople(name);
+    }
+
+    public void updatePeople() {
+        mAdapter.notifyDataSetChanged();
     }
 
     // Provide a reference to the views for each data item
@@ -158,43 +216,67 @@ public class CreateActionActivity extends AppCompatActivity {
         // each data item is just a string in this case
         public ImageView mImageView;
 
-        public EditText mMenberName;
+        public EditText mMemberName;
+        public EditText mPrepaid;
 
         public Button mAdd;
 
-        int patNum;
+        Member mMember;
 
-//        public EditText mEditText;
-//        Spinner mSpinner;
 
-//        public CheckBox mCheckBox;
+        private TextWatcher textWatcher = new TextWatcher() {
 
-        public String apkPath;
-//        public int position;
+            @Override
+            public void afterTextChanged(Editable s) {
+                // TODO Auto-generated method stub
+                if (mAdd.getText().toString().equals("-")){
+                    mAdd.setText("√");
+                    mAdd.setTextColor(CreateActionActivity.this.getResources().getColor(android.R.color.holo_green_light));
+                }
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count,
+                                          int after) {
+                // TODO Auto-generated method stub
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before,
+                                      int count) {
+            }
+        };
+
 
         public ViewHolder(View v) {
             super(v);
 
             mImageView = (ImageView) v.findViewById(R.id.menber_image);
-            mMenberName = (EditText) v.findViewById(R.id.menber_name);
+            mMemberName = (EditText) v.findViewById(R.id.menber_name);
+            mPrepaid = (EditText) v.findViewById(R.id.prepaid);
             mAdd = (Button) v.findViewById(R.id.add_menber);
 
-
-//            mEditText = (EditText) v.findViewById(R.id.pat_num);
-//            mCheckBox = (CheckBox) v.findViewById(R.id.checkbox);
-//            mSpinner = (Spinner) v.findViewById(R.id.spinner1);
-//            mSpinner.setAdapter(adapter);
+            mMemberName.addTextChangedListener(textWatcher);
+            mPrepaid.addTextChangedListener(textWatcher);
 
             mAdd.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (!("".equals(mMenberName.getText().toString()))) {
+                    if (!("".equals(mMemberName.getText().toString()))) {
                         if ("+".equals(mAdd.getText().toString())) {
-                            Log.i(TAG, "onClick: " + mMenberName.getText());
-                            addPeople(mMenberName.getText().toString());
+                            Log.i(TAG, "onClick: " + mMemberName.getText());
+                            if (!"".equals(mPrepaid.getText().toString())) {
+                                mHistoryPrepaid = Float.parseFloat(mPrepaid.getText().toString());
+                            }
+                            addPeople(mMemberName.getText().toString());
                             mAdd.setText("-");
+                        } else if ("-".equals(mAdd.getText().toString())) {
+                            deletePeople(mMemberName.getText().toString());
                         } else {
-                            deletePeople(mMenberName.getText().toString());
+                            mMember.mName = mMemberName.getText().toString();
+                            mMember.mPrepaid = mPrepaid.getText().toString();
+                            updatePeople();
+                            mAdd.setText("-");
                         }
                     }
                 }
@@ -211,19 +293,32 @@ public class CreateActionActivity extends AppCompatActivity {
         // Provide a suitable constructor (depends on the kind of dataset)
         public MyAdapter(Context context, List<Member> myDataset) {
             mDataset = myDataset;
-            editingPeople = myDataset.get(0);
+            if (!mIsEditMode) {
+                editingPeople = myDataset.get(0);
+            } else {
+                editingPeople = myDataset.get(myDataset.size()-1);
+            }
             mHolder = new ArrayList<>();
             context.getTheme().resolveAttribute(R.attr.selectableItemBackground, mTypedValue, true);
             mBackground = mTypedValue.resourceId;
         }
 
-        public List<Member> getPeoples() {
+        public List<Member> getMembers() {
             return mDataset;
         }
 
         private void addPeople(String name) {
+            if (mHistoryPrepaid == -1) {
+                if (!"".equals(mPrepaid.getText().toString())) {
+                    mHistoryPrepaid = Integer.parseInt(mPrepaid.getText().toString());
+                } else {
+                    mHistoryPrepaid = 0;
+                }
+            }
             editingPeople.mName = name;
-            editingPeople = new Member("");
+            editingPeople.mPrepaid = ""+mHistoryPrepaid;
+            editingPeople = new Member("","");
+            editingPeople.mPrepaid = ""+mHistoryPrepaid;
             mDataset.add(editingPeople);
             this.notifyDataSetChanged();
         }
@@ -244,7 +339,7 @@ public class CreateActionActivity extends AppCompatActivity {
             // create a new view
 //            isHost = true;
             View v = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.item_view, parent, false);
+                    .inflate(R.layout.item_create_activity, parent, false);
 //            isHost = false;
             v.setBackgroundResource(mBackground);
             // set the view's size, margins, paddings and layout parameters
@@ -258,16 +353,20 @@ public class CreateActionActivity extends AppCompatActivity {
             // - get element from your dataset at this position
             // - replace the contents of the view with that element
             Member pat = mDataset.get(position);
+            holder.mMember = pat;
 //            holder.mTextView.setText(pat.patName);
             if (pat.mIcon != null) {
                 BitmapDrawable bd = new BitmapDrawable(getResources(), pat.mIcon);
                 holder.mImageView.setImageDrawable(bd);
             }
-            holder.mMenberName.setText(pat.mName);
+            holder.mMemberName.setText(pat.mName);
+            holder.mPrepaid.setText(pat.mPrepaid);
             if (pat.mName.equals("")) {
-                holder.mMenberName.requestFocus();
+                holder.mMemberName.requestFocus();
                 holder.mAdd.setText("+");
+                holder.mAdd.setTextColor(CreateActionActivity.this.getResources().getColor(android.R.color.holo_green_light));
             } else {
+                holder.mAdd.setTextColor(CreateActionActivity.this.getResources().getColor(android.R.color.holo_red_light));
                 holder.mAdd.setText("-");
             }
 
@@ -293,7 +392,7 @@ public class CreateActionActivity extends AppCompatActivity {
             Toast.makeText(this, "请填写完整信息！", Toast.LENGTH_SHORT).show();
             return;
         }
-        if (mActivitySet != null) {
+        if (mActivitySet != null && !(mIsEditMode && activityName.equals(mActivityName))) {
             for (String s : mActivitySet) {
                 if (s.split("\\#")[0].equals(activityName)) {
                     Toast.makeText(this, "活动名已存在，请重新输入！", Toast.LENGTH_SHORT).show();
@@ -302,27 +401,81 @@ public class CreateActionActivity extends AppCompatActivity {
             }
         }
 
-        int activitynums = mActivitySP.getInt("activitynums", -1);
+        String selectedItem = null;
+        for (String s : mActivitySet) {
+            if (s.split("\\#")[0].equals(mActivityName)) {
+                selectedItem = s;
+            }
+        }
 
-        if (mActivitySet == null) mActivitySet = new HashSet<>();
-        mActivitySet.add(activityName+"#"+(activitynums+1));
-        Utils.setSPSet("allactivitys", null, "allactivity");
-        Utils.setSPSet("allactivitys", mActivitySet, "allactivity");
-        Utils.setSPInt("activitynums", activitynums+1, "allactivity");
+        if (mIsEditMode) {
+            int activitynums = Integer.parseInt(mActivityId) -1;
+
+            if (mActivitySet == null) mActivitySet = new HashSet<>();
+
+
+            mActivitySet.remove(selectedItem);
+
+            mActivitySet.add(activityName + "#" + (activitynums + 1) + "#" +
+                    selectedItem.split("\\#")[2]
+                    + "#" + myDataset.get(0).mName
+            );
+            Utils.setSPSet("allactivitys", null, "allactivity");
+            Utils.setSPSet("allactivitys", mActivitySet, "allactivity");
+
+            for (Member p : myDataset) {
+                if (!p.mName.equals("")) {
+                    mSet.add(p.mName + "#" + p.mPrepaid);
+                }
+            }
+
+            String activityFileName = "activity" + (activitynums + 1);
+
+            Utils.setSPString("ActionName", activityName, activityFileName);
+            Utils.setSPSet("Members", null, activityFileName);
+            Utils.setSPSet("Members", mSet, activityFileName);
+        } else {
+            int activitynums = mActivitySP.getInt("activitynums", -1);
+
+            if (mActivitySet == null) mActivitySet = new HashSet<>();
+            mActivitySet.add(activityName + "#" + (activitynums + 1) + "#" +
+                    new StringBuffer().append(mYear).append("-").append(mMonth + 1).append("-").append(mDay)
+                    + "#" + myDataset.get(0).mName
+            );
+            Utils.setSPSet("allactivitys", null, "allactivity");
+            Utils.setSPSet("allactivitys", mActivitySet, "allactivity");
+            Utils.setSPInt("activitynums", activitynums + 1, "allactivity");
 
 
 //        setSPString("ActionName", mActionNameView.getText().toString());
 //        myDataset = mAdapter.getPeoples();
-        for (Member p:myDataset) {
-            if (!p.mName.equals("")) {
-                mSet.add(p.mName);
+            for (Member p : myDataset) {
+                if (!p.mName.equals("")) {
+                    mSet.add(p.mName + "#" + p.mPrepaid);
+                }
             }
-        }
 
-        Utils.setSPString("ActionName", activityName, "activity"+(activitynums+1));
-        Utils.setSPSet("Members", mSet, "activity"+(activitynums+1));
+            Utils.setSPString("ActionName", activityName, "activity" + (activitynums + 1));
+            Utils.setSPString("HostName", myDataset.get(0).mName, "activity" + (activitynums + 1));
+            Utils.setSPSet("Members", mSet, "activity" + (activitynums + 1));
 //        setSPSet("Members", mSet);
+        }
         finish();
     }
 
+    public void importMembers(View view) {
+        if (mMembers == null) {
+            Toast.makeText(this, "暂没有常用联系人！", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        mMultiAlertDialog.showMembersAlertDialog(mMembers, mSelectedMembers, new MultiAlertDialog.CallbackResultListener() {
+
+            @Override
+            public void done(List<String> result) {
+                for (String s:mSelectedMembers) {
+                    addPeople(s);
+                }
+            }
+        });
+    }
 }

@@ -40,6 +40,10 @@ public class ViewBillActivity extends AppCompatActivity {
     private Set<String> mSet;
     List<ViewHolder> mHolder;
 
+    float mTotalPay = 0;
+    float mTotalCost = 0;
+    float mTotalPrepaid = 0;
+
 
     SharedPreferences mSP;
     SharedPreferences.Editor mEditor;
@@ -86,7 +90,14 @@ public class ViewBillActivity extends AppCompatActivity {
 
         for (Map.Entry<String, Member> entry : mMembers.entrySet()) {
 
-            myDataset.add(entry.getValue());
+            Member member = entry.getValue();
+            myDataset.add(member);
+            mTotalPay += member.mPay;
+            mTotalCost += member.mCost;
+            if (member.mPrepaid > 0) {
+                mTotalPrepaid += member.mPrepaid;
+            }
+
 
         }
 
@@ -98,25 +109,6 @@ public class ViewBillActivity extends AppCompatActivity {
     @Override
     public void onStop() {
         super.onStop();
-        for (ViewHolder viewHolder:mHolder) {
-//            if (viewHolder.patNum > 0) {
-//                StringBuffer stringBuffer = new StringBuffer();
-//                stringBuffer.append(viewHolder.patNum + "#");
-//                stringBuffer.append(viewHolder.apkPath + "#");
-////                stringBuffer.append(viewHolder.mTextView.getText().toString());
-//                mSet.add(stringBuffer.toString());
-//            }
-/*
-            if (viewHolder.mCheckBox.isChecked()) {
-                StringBuffer stringBuffer = new StringBuffer();
-                stringBuffer.append(viewHolder.mEditText.getText().toString() + "#");
-                stringBuffer.append(viewHolder.apkPath + "#");
-                stringBuffer.append(viewHolder.mTextView.getText().toString());
-                mSet.add(stringBuffer.toString());
-            }
-*/
-        }
-//        setSPSet("PatSet", mSet);
     }
 
     private void loadItems() {
@@ -141,12 +133,6 @@ public class ViewBillActivity extends AppCompatActivity {
                 for (String m:strs2) {
                     Member member = mMembers.get(m);
                     member.mCost += item1.mAverage;
-//                    for (String pm:strs3) {
-//                        if (m.equals(pm)) {
-//                            Log.i(TAG, "loadItems1: THQ1" + m + " " + item1.mPayer);
-//                            member.mPay += item1.mTotal;
-//                        }
-//                    }
                     member.mJoinedItems.add(item1.mItemName);
                 }
             }
@@ -157,7 +143,8 @@ public class ViewBillActivity extends AppCompatActivity {
         mSet =  mSP.getStringSet("Members", null);
         if (mSet != null) {
             for (String member : mSet) {
-                mMembers.put(member, new Member(member));
+                String[] strs = member.split("\\#");
+                mMembers.put(strs[0], new Member(strs[0], Float.parseFloat(strs[1])));
             }
 
         }
@@ -209,9 +196,11 @@ public class ViewBillActivity extends AppCompatActivity {
         public float mPay;
         public float mCost;
         public float mTotal;
+        public float mPrepaid;
         List<String> mJoinedItems = new ArrayList<>();
-        Member (String name) {
+        Member (String name, float prepaid) {
             mName = name;
+            mPrepaid = prepaid;
         }
     }
 
@@ -230,11 +219,11 @@ public class ViewBillActivity extends AppCompatActivity {
         public ViewHolder(View v) {
             super(v);
 
-            mName = (TextView) v.findViewById(R.id.member_name);
-            mJoindItem = (TextView) v.findViewById(R.id.joined_item);
-            mCost = (TextView) v.findViewById(R.id.cost);
-            mTotal = (TextView) v.findViewById(R.id.create_date);
-            mPay = (TextView) v.findViewById(R.id.pay);
+            mName = (TextView) v.findViewById(R.id.bill_member_name);
+            mJoindItem = (TextView) v.findViewById(R.id.bill_joined_item);
+            mCost = (TextView) v.findViewById(R.id.bill_cost);
+            mTotal = (TextView) v.findViewById(R.id.bill_total);
+            mPay = (TextView) v.findViewById(R.id.bill_pay);
 
         }
     }
@@ -247,7 +236,8 @@ public class ViewBillActivity extends AppCompatActivity {
         // Provide a suitable constructor (depends on the kind of dataset)
         public MyAdapter(Context context, List<Member> myDataset) {
             mDataset = myDataset;
-            mHolder = new ArrayList<>();
+            myDataset.add(new Member("", 0));
+//            mHolder = new ArrayList<>();
             context.getTheme().resolveAttribute(R.attr.selectableItemBackground, mTypedValue, true);
             mBackground = mTypedValue.resourceId;
         }
@@ -258,8 +248,7 @@ public class ViewBillActivity extends AppCompatActivity {
 
 
         @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent,
-                                                                  int viewType) {
+        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             // create a new view
 //            isHost = true;
             View v = LayoutInflater.from(parent.getContext())
@@ -268,7 +257,7 @@ public class ViewBillActivity extends AppCompatActivity {
             v.setBackgroundResource(mBackground);
             // set the view's size, margins, paddings and layout parameters
             ViewHolder vh = new ViewHolder(v);
-            mHolder.add(vh);
+//            mHolder.add(vh);
             return vh;
         }
 
@@ -276,14 +265,24 @@ public class ViewBillActivity extends AppCompatActivity {
         public void onBindViewHolder(ViewHolder holder, int position) {
             // - get element from your dataset at this position
             // - replace the contents of the view with that element
-            Member pat = mDataset.get(position);
+            if (mDataset.size()-1 == position) {
+                holder.mName.setVisibility(View.INVISIBLE);
+                holder.mJoindItem.setVisibility(View.GONE);
+                holder.mPay.setText("总预付:" + mTotalPrepaid);
+                holder.mCost.setText("总花费:" + mTotalCost);
+//                holder.mTotal.setVisibility(View.GONE);
+                holder.mTotal.setText("总支付:" + mTotalPay);
+            } else {
+                Member pat = mDataset.get(position);
 //            holder.mTextView.setText(pat.patName);
-            holder.mName.setText(pat.mName);
-            holder.mJoindItem.setText("参与:"+pat.mJoinedItems.toString());
-            holder.mPay.setText("支出:"+pat.mPay);
-            holder.mCost.setText("花费:"+pat.mCost);
-            holder.mTotal.setText("总共:"+(pat.mCost - pat.mPay));
-            Log.i(TAG, "onBindViewHolder: THQ");
+                holder.mName.setText(pat.mName);
+                holder.mJoindItem.setText("参与:" + pat.mJoinedItems.toString());
+                holder.mPay.setText("支出:" + pat.mPay);
+                holder.mCost.setText("花费:" + pat.mCost);
+                holder.mTotal.setText("总共:" + (pat.mCost - pat.mPay - pat.mPrepaid));
+
+//                Log.i(TAG, "onBindViewHolder: THQ");
+            }
         }
 
         // Return the size of your dataset (invoked by the layout manager)

@@ -22,7 +22,10 @@ import com.thq.aaaccount.widget.DividerItemDecoration;
 import com.thq.aaaccount.widget.RecyclerItemClickListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -31,6 +34,8 @@ public class ViewActionItemActivity extends AppCompatActivity {
     private static final String TAG = "THQ MainActivity";
 
     private Toolbar mToolbar;
+
+    private TextView mHint;
 
     private RecyclerView mRecyclerView;
     private LinearLayoutManager mLayoutManager;
@@ -57,8 +62,9 @@ public class ViewActionItemActivity extends AppCompatActivity {
         mActivityFileName = "activity" + mActivityId;//Utils.getIdFromActivityName(this, activityName);
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
+//        mToolbar.setTitle(R.string.app_name_view_item);
+        mToolbar.setTitle(Utils.getActivityNameFromId(mActivityId));
         setSupportActionBar(mToolbar);
-        mToolbar.setTitle(R.string.app_name_view_item);
 
 
 //        mSP = getSharedPreferences(mActivityFileName, Context.MODE_PRIVATE);
@@ -73,6 +79,8 @@ public class ViewActionItemActivity extends AppCompatActivity {
         mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, onItemClickListener));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
+        mHint = (TextView) findViewById(R.id.item_hint);
+
         mSet = new HashSet<>();
         // specify an adapter (see also next example)
         myDataset = new ArrayList<>();
@@ -84,6 +92,11 @@ public class ViewActionItemActivity extends AppCompatActivity {
         super.onResume();
         myDataset.clear();
         loadItems();
+        if (myDataset.size() == 0) {
+            mHint.setVisibility(View.VISIBLE);
+        } else {
+            mHint.setVisibility(View.GONE);
+        }
         if (mAdapter == null) {
             mAdapter = new ViewActionItemActivity.MyAdapter(this, myDataset);
             mRecyclerView.setAdapter(mAdapter);
@@ -124,6 +137,7 @@ public class ViewActionItemActivity extends AppCompatActivity {
 //        mSet = new HashSet<>();
 //        mSet =  mSP.getStringSet("Items", null);
         mSet =  Utils.getSPSet("Items", null, mActivityFileName);
+        mSet = sortByValue(mSet);
         if (mSet != null) {
             for (String item : mSet) {
                 String[] strs = item.split("\\#");
@@ -132,6 +146,21 @@ public class ViewActionItemActivity extends AppCompatActivity {
                 myDataset.add(item1);
             }
         }
+    }
+
+    public static Set<String> sortByValue(Set<String> set){
+        if (set == null) return null;
+        List<String> setList= new ArrayList<String>(set);
+        Collections.sort(setList, new Comparator<Object>() {
+            @Override
+            public int compare(Object o1, Object o2) {
+                // TODO Auto-generated method stub
+                return o2.toString().split("\\#")[6].compareTo(o1.toString().split("\\#")[6]);
+            }
+
+        });
+        set = new LinkedHashSet<String>(setList);//这里注意使用LinkedHashSet
+        return set;
     }
 
     private void setSPString(String key, String value) {
@@ -208,11 +237,11 @@ public class ViewActionItemActivity extends AppCompatActivity {
         public ViewHolder(View v) {
             super(v);
 
-            mPayMan = (TextView) v.findViewById(R.id.cteate_time);
-            mItemName = (TextView) v.findViewById(R.id.action_name);
-            mMembers = (TextView) v.findViewById(R.id.members);
-            mTotal = (TextView) v.findViewById(R.id.create_date);
-            mAverage = (TextView) v.findViewById(R.id.average);
+            mPayMan = (TextView) v.findViewById(R.id.view_payer);
+            mItemName = (TextView) v.findViewById(R.id.view_item_name);
+            mMembers = (TextView) v.findViewById(R.id.view_members);
+            mTotal = (TextView) v.findViewById(R.id.view_total);
+            mAverage = (TextView) v.findViewById(R.id.view_average);
             mDelete = (Button) v.findViewById(R.id.button7);
             mEdit = (Button) v.findViewById(R.id.button8);
 

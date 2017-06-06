@@ -21,13 +21,23 @@
         >
 
         <EditText
-            android:id="@+id/action_name"
+            android:id="@+id/item_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/item_name"
             />
     </android.support.design.widget.TextInputLayout>
 
+
+    <TextView
+        android:text="Create Time"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:gravity="center_vertical"
+        android:id="@+id/create_time"
+        android:layout_marginLeft="@dimen/child_view_margin"
+        android:onClick="showDatePicker"
+         />
 
     <TextView
         android:text="Action Name"
@@ -56,7 +66,7 @@
         android:layout_height="50dp"
         android:gravity="center_vertical"
         android:layout_marginLeft="@dimen/child_view_margin"
-        android:id="@+id/cteate_time"
+        android:id="@+id/payer"
         android:onClick="showPayManAlertDialog"
          />
 
@@ -75,7 +85,7 @@
             >
 
             <EditText
-                android:id="@+id/create_date"
+                android:id="@+id/total"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/item_cost"

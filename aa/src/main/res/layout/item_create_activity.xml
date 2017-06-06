@@ -13,8 +13,8 @@
 
     <ImageView
         android:id="@+id/menber_image"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="6dp"
         android:layout_marginRight="6dp"
@@ -24,10 +24,10 @@
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/textInputPatNum"
-        android:layout_width="200dp"
+        android:layout_width="140dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/child_view_margin"
-        android:layout_marginRight="@dimen/child_view_margin"
+        android:layout_marginLeft="@dimen/child_view_margin_short"
+        android:layout_marginRight="@dimen/child_view_margin_short"
         >
 
         <EditText
@@ -38,11 +38,29 @@
              />
     </android.support.design.widget.TextInputLayout>
 
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/textInputPrepaid"
+        android:layout_width="70dp"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="@dimen/child_view_margin_short"
+        >
+
+        <EditText
+            android:id="@+id/prepaid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/prepaid"
+            android:inputType="numberSigned"
+             />
+    </android.support.design.widget.TextInputLayout>
+
     <Button
         android:text="+"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/add_menber"
+        android:background="@color/list_item"
+        android:textColor="@color/primary_dark"
         />
     <!--<EditText-->
         <!--android:layout_width="wrap_content"-->

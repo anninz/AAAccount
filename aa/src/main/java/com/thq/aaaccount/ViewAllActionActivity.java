@@ -21,10 +21,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.thq.aaaccount.widget.DividerItemDecoration;
-import com.thq.aaaccount.widget.RecyclerItemClickListener;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -33,6 +40,8 @@ public class ViewAllActionActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
     private Toolbar mToolbar;
+
+    private TextView mHint;
 
     private RecyclerView mRecyclerView;
     private LinearLayoutManager mLayoutManager;
@@ -72,8 +81,10 @@ public class ViewAllActionActivity extends AppCompatActivity {
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST));
-        mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, onItemClickListener));
+//        mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, onItemClickListener));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+
+        mHint = (TextView) findViewById(R.id.action_hint);
 
         mSet = new HashSet<>();
         // specify an adapter (see also next example)
@@ -86,8 +97,14 @@ public class ViewAllActionActivity extends AppCompatActivity {
         super.onResume();
         myDataset.clear();
         loadActivitys();
+        if (myDataset.size() == 0) {
+            mHint.setVisibility(View.VISIBLE);
+        } else {
+            mHint.setVisibility(View.GONE);
+        }
         if (mAdapter == null) {
-            mAdapter = new ViewAllActionActivity.MyAdapter(this, myDataset);
+            mAdapter = new MyAdapter(this, myDataset);
+            mAdapter.setOnItemClickListener(onItemClickListener);
             mRecyclerView.setAdapter(mAdapter);
         } else {
             mAdapter.update();
@@ -98,59 +115,43 @@ public class ViewAllActionActivity extends AppCompatActivity {
     @Override
     public void onStop() {
         super.onStop();
-        for (ViewHolder viewHolder:mHolder) {
-//            if (viewHolder.patNum > 0) {
-//                StringBuffer stringBuffer = new StringBuffer();
-//                stringBuffer.append(viewHolder.patNum + "#");
-//                stringBuffer.append(viewHolder.apkPath + "#");
-////                stringBuffer.append(viewHolder.mTextView.getText().toString());
-//                mSet.add(stringBuffer.toString());
-//            }
-/*
-            if (viewHolder.mCheckBox.isChecked()) {
-                StringBuffer stringBuffer = new StringBuffer();
-                stringBuffer.append(viewHolder.mEditText.getText().toString() + "#");
-                stringBuffer.append(viewHolder.apkPath + "#");
-                stringBuffer.append(viewHolder.mTextView.getText().toString());
-                mSet.add(stringBuffer.toString());
-            }
-*/
-        }
-//        setSPSet("PatSet", mSet);
     }
 
     private void loadActivitys() {
         mSet =  mSP.getStringSet("allactivitys", null);
+        mSet = sortByValue(mSet);
         if (mSet != null) {
             for (String activity : mSet) {
                 String[] strs = activity.split("\\#");
-                String members = Utils.getSPSet("Members", null, "activity"+strs[1]).toString();
+                Set<String> members = Utils.getSPSet("Members", null, "activity"+strs[1]);
 //                Log.i(TAG, "loadItems: " + strs[0] + strs[1] + strs[2] + strs[3] + strs[4]);
-                Activity activity1 = new Activity(strs[0], members, "null", "null", "null");
+                Activity activity1 = new Activity(strs[0], loadMembers(members), "china", strs[2], strs[3]);
                 myDataset.add(activity1);
             }
         }
     }
 
-    private void setSPString(String key, String value) {
-        SharedPreferences sp = getSharedPreferences(mActivityFileName, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sp.edit();
-        editor.putString(key, value);
-        editor.commit();
+    private String loadMembers(Set<String> members) {
+        Set<String> set = new HashSet<>();
+        for (String s:members) {
+            set.add(s.split("\\#")[0]);
+        }
+        return set.toString();
     }
 
-    private void setSPInt(String key, int value) {
-        SharedPreferences sp = getSharedPreferences(mActivityFileName, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sp.edit();
-        editor.putInt(key, value);
-        editor.commit();
-    }
+    public static Set<String> sortByValue(Set<String> set){
+        if (set == null) return null;
+        List<String> setList= new ArrayList<String>(set);
+        Collections.sort(setList, new Comparator<Object>() {
+            @Override
+            public int compare(Object o1, Object o2) {
+                // TODO Auto-generated method stub
+                return o2.toString().split("\\#")[2].compareTo(o1.toString().split("\\#")[2]);
+            }
 
-    private void setSPSet(String key, Set<String> value) {
-        SharedPreferences sp = getSharedPreferences(mActivityFileName, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sp.edit();
-        editor.putStringSet(key, value);
-        editor.commit();
+        });
+        set = new LinkedHashSet<String>(setList);//这里注意使用LinkedHashSet
+        return set;
     }
 
     private void commit(String key) {
@@ -176,11 +177,11 @@ public class ViewAllActionActivity extends AppCompatActivity {
         public String mLocal;
         public String mCreateDate;
         public String mMembers;
-        Activity (String actionName, String members, String local, String total, String creater) {
+        Activity (String actionName, String members, String local, String date, String creater) {
             mActivityName = actionName;
             mCreater = creater;
             mLocal = local;
-            mCreateDate = total;
+            mCreateDate = date;
             mMembers = members;
         }
     }
@@ -194,7 +195,7 @@ public class ViewAllActionActivity extends AppCompatActivity {
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
     // you provide access to all the views for a data item in a view holder
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         // each data item is just a string in this case
         public TextView mActivityNameView;
         public TextView mCreaterView;
@@ -204,14 +205,19 @@ public class ViewAllActionActivity extends AppCompatActivity {
         public Button mDelete;
         public Button mEdit;
 
-        public ViewHolder(View v) {
+        private MyItemClickListener myItemClickListener;
+
+        public ViewHolder(View v, MyItemClickListener iemClickListener) {
             super(v);
 
-            mMembersView = (TextView) v.findViewById(R.id.members);
-            mActivityNameView = (TextView) v.findViewById(R.id.action_name);
-            mCreaterView = (TextView) v.findViewById(R.id.creater);
-            mCreateDateView = (TextView) v.findViewById(R.id.create_date);
-            mCreateLocalView = (TextView) v.findViewById(R.id.create_local);
+            myItemClickListener = iemClickListener;
+            v.setOnClickListener(this);
+
+            mMembersView = (TextView) v.findViewById(R.id.view_action_members);
+            mActivityNameView = (TextView) v.findViewById(R.id.view_action_action_name);
+            mCreaterView = (TextView) v.findViewById(R.id.view_action_creater);
+            mCreateDateView = (TextView) v.findViewById(R.id.view_action_date);
+            mCreateLocalView = (TextView) v.findViewById(R.id.view_action_create_local);
             mDelete = (Button) v.findViewById(R.id.button7);
             mEdit = (Button) v.findViewById(R.id.button8);
 
@@ -235,12 +241,17 @@ public class ViewAllActionActivity extends AppCompatActivity {
             });
 
         }
+
+        @Override
+        public void onClick(View v) {
+            myItemClickListener.onItemClick(v, getPosition());
+        }
     }
 
     public void showAlertDialog(final String key){
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setTitle("警告");
-        alertDialogBuilder.setIcon(android.R.drawable.ic_dialog_dialer);
+        alertDialogBuilder.setIcon(android.R.drawable.ic_dialog_alert);
         alertDialogBuilder.setMessage("删除后，所有该活动相关的信息都将消失，请确定要删除吗？");
         alertDialogBuilder.setPositiveButton("删除", new DialogInterface.OnClickListener() {
             @Override
@@ -268,17 +279,30 @@ public class ViewAllActionActivity extends AppCompatActivity {
         alertDialogBuilder.show();
     }
 
-    private void editActivity(String activityName) {
+    private void viewActivity(String activityName) {
         Intent intent = new Intent(this, ViewActionItemActivity.class);
 //        intent.putExtra("itemName", itemName);
         intent.putExtra("activityId", ""+Utils.getIdFromActivityName(activityName));
         startActivity(intent);
     }
 
+    private void editActivity(String activityName) {
+        Intent intent = new Intent(this, CreateActionActivity.class);
+        intent.putExtra("activityName", activityName);
+        intent.putExtra("activityId", ""+Utils.getIdFromActivityName(activityName));
+        startActivity(intent);
+    }
+
+    public interface MyItemClickListener {
+        public void onItemClick(View view,int position);
+    }
+
     public class MyAdapter extends RecyclerView.Adapter<ViewHolder> {
         private final int mBackground;
         private List<Activity> mDataset;
         private final TypedValue mTypedValue = new TypedValue();
+
+        MyItemClickListener mItemClickListener;
 
         // Provide a suitable constructor (depends on the kind of dataset)
         public MyAdapter(Context context, List<Activity> myDataset) {
@@ -293,8 +317,6 @@ public class ViewAllActionActivity extends AppCompatActivity {
         }
 
         public void update() {
-//            mDataset.clear();
-//            mDataset = myDataset;
             notifyDataSetChanged();
         }
 
@@ -309,9 +331,16 @@ public class ViewAllActionActivity extends AppCompatActivity {
             this.notifyDataSetChanged();
         }
 
+        /**
+         * 设置Item点击监听
+         * @param listener
+         */
+        public void setOnItemClickListener(MyItemClickListener listener){
+            this.mItemClickListener = listener;
+        }
+
         @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent,
-                                                                  int viewType) {
+        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             // create a new view
 //            isHost = true;
             View v = LayoutInflater.from(parent.getContext())
@@ -319,8 +348,8 @@ public class ViewAllActionActivity extends AppCompatActivity {
 //            isHost = false;
             v.setBackgroundResource(mBackground);
             // set the view's size, margins, paddings and layout parameters
-            ViewHolder vh = new ViewHolder(v);
-            mHolder.add(vh);
+            ViewHolder vh = new ViewHolder(v, mItemClickListener);
+//            mHolder.add(vh);
             return vh;
         }
 
@@ -331,11 +360,11 @@ public class ViewAllActionActivity extends AppCompatActivity {
             Activity pat = mDataset.get(position);
 //            holder.mTextView.setText(pat.patName);
             holder.mActivityNameView.setText(pat.mActivityName);
-            holder.mCreateLocalView.setText(pat.mMembers);
+            holder.mCreateLocalView.setText(pat.mLocal);
             holder.mCreaterView.setText(pat.mCreater);
             holder.mCreateDateView.setText(pat.mCreateDate);
-            holder.mMembersView.setText(pat.mLocal);
-            Log.i(TAG, "onBindViewHolder: THQ");
+            holder.mMembersView.setText(pat.mMembers);
+//            Log.i(TAG, "onBindViewHolder: THQ");
         }
 
         // Return the size of your dataset (invoked by the layout manager)
@@ -344,13 +373,20 @@ public class ViewAllActionActivity extends AppCompatActivity {
             return mDataset.size();
         }
     }
+//
+//    private RecyclerItemClickListener.OnItemClickListener onItemClickListener = new RecyclerItemClickListener.OnItemClickListener() {
+//        @Override
+//        public void onItemClick(View view, int position) {
+//            viewActivity(myDataset.get(position).mActivityName);
+//        }
+//    };
 
-    private RecyclerItemClickListener.OnItemClickListener onItemClickListener = new RecyclerItemClickListener.OnItemClickListener() {
+    private MyItemClickListener onItemClickListener = new MyItemClickListener() {
         @Override
         public void onItemClick(View view, int position) {
+            viewActivity(myDataset.get(position).mActivityName);
         }
     };
-
 
     public void createAction(View view) {
         Intent intent = new Intent(this, CreateActionActivity.class);
@@ -367,4 +403,160 @@ public class ViewAllActionActivity extends AppCompatActivity {
         }
     }
 
+
+
+
+    String mDataDir = "/data/data/com.thq.aaaccount/shared_prefs/";
+    String mBackupDir = "/sdcard/aaaccount/shared_prefs/";
+    public void backupActivityEvent(View view) {
+        showBackupDialog();
+    }
+
+    public void restoreActivityEvent(View view) {
+        showRestoreDialog();
+    }
+
+    public void backupActivity() {
+        SimpleDateFormat sDateFormat =   new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        String date = sDateFormat.format(new java.util.Date());
+        copyFolder(mDataDir, mBackupDir+date+"/");
+        Toast.makeText(ViewAllActionActivity.this, "备份完成！！", Toast.LENGTH_SHORT).show();
+    }
+
+    public void restoreActivity() {
+        File a=new File(mBackupDir);
+        final String[] file=a.list();
+        if (file.length == 0) {
+            Toast.makeText(ViewAllActionActivity.this, "没有可还原数据！！", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        new MultiAlertDialog(this).showSingleAlertDialog(file, new ArrayList<String>(), new MultiAlertDialog.CallbackResultListener() {
+            @Override
+            public void done(List<String> result) {
+                File file1 = new File(mDataDir);
+                if (file1.exists()) file1.delete();
+                copyFolder(mBackupDir + result.get(0), mDataDir);
+                Toast.makeText(ViewAllActionActivity.this, "还原完成！！", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public void showRestoreDialog(){
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setTitle("警告");
+        alertDialogBuilder.setIcon(android.R.drawable.ic_dialog_alert);
+        alertDialogBuilder.setMessage("还原后，现有的数据将消失，确定要还原吗？");
+        alertDialogBuilder.setPositiveButton("还原", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface arg0, int arg1) {
+                restoreActivity();
+            }
+        });
+        alertDialogBuilder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface arg0, int arg1) {
+            }
+        });
+        alertDialogBuilder.show();
+    }
+
+    public void showBackupDialog(){
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setTitle("警告");
+        alertDialogBuilder.setIcon(android.R.drawable.ic_dialog_alert);
+        alertDialogBuilder.setMessage("确定好备份数据吗？");
+        alertDialogBuilder.setPositiveButton("备份", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface arg0, int arg1) {
+                backupActivity();
+            }
+        });
+        alertDialogBuilder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface arg0, int arg1) {
+            }
+        });
+        alertDialogBuilder.show();
+    }
+
+    /**
+     * 复制单个文件
+     * @param oldPath String 原文件路径 如：c:/fqf.txt
+     * @param newPath String 复制后路径 如：f:/fqf.txt
+     * @return boolean
+     */
+    public void copyFile(String oldPath, String newPath) {
+        try {
+            int bytesum = 0;
+            int byteread = 0;
+            File oldfile = new File(oldPath);
+            if (oldfile.exists()) { //文件存在时
+                InputStream inStream = new FileInputStream(oldPath); //读入原文件
+                FileOutputStream fs = new FileOutputStream(newPath);
+                byte[] buffer = new byte[1444];
+                int length;
+                while ( (byteread = inStream.read(buffer)) != -1) {
+                    bytesum += byteread; //字节数 文件大小
+                    System.out.println(bytesum);
+                    fs.write(buffer, 0, byteread);
+                }
+                inStream.close();
+            }
+        }
+        catch (Exception e) {
+            System.out.println("复制单个文件操作出错");
+            e.printStackTrace();
+
+        }
+
+    }
+
+    /**
+     * 复制整个文件夹内容
+     * @param oldPath String 原文件路径 如：c:/fqf
+     * @param newPath String 复制后路径 如：f:/fqf/ff
+     * @return boolean
+     */
+    public void copyFolder(String oldPath, String newPath) {
+
+        try {
+            (new File(newPath)).mkdirs(); //如果文件夹不存在 则建立新文件夹
+            File a=new File(oldPath);
+            String[] file=a.list();
+            File temp=null;
+            for (int i = 0; i < file.length; i++) {
+                if(oldPath.endsWith(File.separator)){
+                    temp=new File(oldPath+file[i]);
+                }
+                else{
+                    temp=new File(oldPath+File.separator+file[i]);
+                }
+
+                if(temp.isFile()){
+                    FileInputStream input = new FileInputStream(temp);
+                    FileOutputStream output = new FileOutputStream(newPath + "/" +
+                            (temp.getName()).toString());
+                    byte[] b = new byte[1024 * 5];
+                    int len;
+                    while ( (len = input.read(b)) != -1) {
+                        output.write(b, 0, len);
+                    }
+                    output.flush();
+                    output.close();
+                    input.close();
+                }
+                if(temp.isDirectory()){//如果是子文件夹
+                    copyFolder(oldPath+"/"+file[i],newPath+"/"+file[i]);
+                }
+            }
+        }
+        catch (Exception e) {
+            System.out.println("复制整个文件夹内容操作出错");
+            e.printStackTrace();
+
+        }
+
+    }
 }

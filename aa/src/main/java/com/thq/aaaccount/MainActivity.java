@@ -1,15 +1,21 @@
 package com.thq.aaaccount;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.os.Handler;
+import android.os.Message;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
-import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -28,6 +34,17 @@ public class MainActivity extends AppCompatActivity {
 
         if (Utils.getLastestActivityId() < 0) {
             Utils.setSPInt("activitynums", 0, "allactivity");
+        }
+
+        image1 = (ImageView) findViewById(R.id.image);
+        //初始化时显示第一张图片
+        image1.setImageResource(R.drawable.pic5);
+//        runImage();
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            String[] strings =  {Manifest.permission.WRITE_EXTERNAL_STORAGE};
+             ActivityCompat.requestPermissions(this, strings, 100);
         }
     }
 
@@ -62,4 +79,37 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "请先创建活动", Toast.LENGTH_SHORT).show();
         }
     }
+
+
+    private void runImage() {
+        handler.post(myRunnable);
+
+    }
+    private ImageView image1;
+    //定义一个int数组来存放图片，在R文件中图片是以int形式存在的
+    int[] images = new int[] {
+//            R.drawable.pic1,
+//            R.drawable.pic2,
+//            R.drawable.pic1,
+//            R.drawable.pic2,
+//            R.drawable.pic1,
+             };
+    //定义一图片计数器
+    int currentImg = 0;
+    //定义一个handler来进行隔时间操作
+    private Handler handler = new Handler();
+    private Runnable myRunnable = new Runnable() {
+        public void run() {
+            //每隔1秒切换一次
+            handler.postDelayed(this, 8000);
+
+            if (currentImg >= 4) {
+                currentImg = -1;
+            }
+            // 改变ImageView里显示的图片
+            image1.setImageResource(images[++currentImg]);
+
+        }
+    };
+
 }

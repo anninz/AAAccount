@@ -1,5 +1,7 @@
 package com.thq.aaaccount;
 
+import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -13,18 +15,20 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.DatePicker;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class CreateActionItemActivity extends AppCompatActivity {
 
-    private static final String TAG = "THQ MainActivity";
+    private static final String TAG = "CreateAction";
 
     private Toolbar mToolbar;
 
@@ -46,6 +50,7 @@ public class CreateActionItemActivity extends AppCompatActivity {
 
     TextView mTotalView;
     TextView mItemNameView;
+    TextView mCreateTimeView;
     TextView mActionNameView;
     TextView mAverageView;
     TextView mSelectedMembersView;
@@ -55,6 +60,10 @@ public class CreateActionItemActivity extends AppCompatActivity {
     String mActivityFileName = null;
     String mActivityName = null;
     String mActivityId = null;
+    String mHostName = null;
+
+    int mYear, mMonth, mDay;
+    final int DATE_DIALOG = 1;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -70,23 +79,25 @@ public class CreateActionItemActivity extends AppCompatActivity {
         }
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(mToolbar);
         if (itemName == null) {
             mToolbar.setTitle(R.string.app_name_create_item);
         } else {
             mIsEditMode = true;
             mToolbar.setTitle(R.string.app_name_edit_item);
         }
+        setSupportActionBar(mToolbar);
 
-        mTotalView = (TextView) findViewById(R.id.create_date);
-        mItemNameView = (TextView) findViewById(R.id.action_name);
+        mTotalView = (TextView) findViewById(R.id.total);
+        mItemNameView = (TextView) findViewById(R.id.item_name);
+        mCreateTimeView = (TextView) findViewById(R.id.create_time);
         mActionNameView = (TextView) findViewById(R.id.belong_action);
         mAverageView = (TextView) findViewById(R.id.average);
-        mPayerView = (TextView) findViewById(R.id.cteate_time);
+        mPayerView = (TextView) findViewById(R.id.payer);
         mSelectedMembersView = (TextView) findViewById(R.id.members);
 
         mPayerView.addTextChangedListener(textWatcher);
         mTotalView.addTextChangedListener(textWatcher);
+        mSelectedMembersView.addTextChangedListener(textWatcher);
 
         mActivityId = activityId == null? String.valueOf(Utils.getLastestActivityId()):activityId;
 
@@ -100,6 +111,8 @@ public class CreateActionItemActivity extends AppCompatActivity {
         mActions = new String[mActivitySet.size()];
 
         mActivityName = mSP.getString("ActionName", null);
+        mHostName = mSP.getString("HostName", null);
+        mPayerView.setText("付款人:"+mHostName);
 
         int i1 = 0;
         for (String s:mActivitySet) {
@@ -110,9 +123,9 @@ public class CreateActionItemActivity extends AppCompatActivity {
 //        mActions = mActivitySet.toArray(mActions);
 
         mItemsSet = mSP.getStringSet("Items", null);
-        mMemberSet = mSP.getStringSet("Members", null);
-        mMembers = new String[mMemberSet.size()];
-        mMembers = mMemberSet.toArray(mMembers);
+
+        loadMembers();
+
         mMembersToDialog = new String[mMembers.length + 1];
         mMembersToDialog[mMembers.length] = "全选";
         for (int i = 0;i < mMembers.length; i++) {
@@ -124,6 +137,57 @@ public class CreateActionItemActivity extends AppCompatActivity {
             loadItemsToView(itemName);
         }
 
+        initDatePicker();
+        intiMembers();
+    }
+
+    private void initDatePicker() {
+        final Calendar ca = Calendar.getInstance();
+        mYear = ca.get(Calendar.YEAR);
+        mMonth = ca.get(Calendar.MONTH);
+        mDay = ca.get(Calendar.DAY_OF_MONTH);
+        mCreateTimeView.setText(new StringBuffer().append("时间:").append(mYear).append("-").append(mMonth + 1).append("-").append(mDay));
+    }
+
+    public void showDatePicker(View view) {
+        showDialog(DATE_DIALOG);
+    }
+
+    private void  intiMembers() {
+        StringBuffer mSelectedMenbers = new StringBuffer();
+
+        Log.i(TAG, "onClick: THQ1 " + selectedMemberIndex.size());
+
+        for (String i : mMembers) {
+            mSelectedMenbers.append(i + ",");
+        }
+        mSelectedMembersNum = selectedMemberIndex.size();
+        mSelectedMembersView.setText("参与人:" + mSelectedMenbers);
+
+
+        if (selectedMemberIndex.size()==0) {
+            for (int i = 0; i < mMembersToDialog.length; i++) {
+                selectedMemberIndex.add(i);
+            }
+        }
+        mSelectedMembersNum = mMembers.length;
+
+
+        for (int i = 0; i < mMembers.length; i++) {
+            if (mMembers[i].equals(mHostName)) {
+                selectedPayManIndex.add(i);
+                break;
+            }
+        }
+    }
+
+    private void loadMembers() {
+        mMemberSet = mSP.getStringSet("Members", null);
+        mMembers = new String[mMemberSet.size()];
+        int i = 0;
+        for (String s:mMemberSet) {
+            mMembers[i++] = s.split("\\#")[0];
+        }
     }
 
     private void reloadData() {
@@ -158,7 +222,7 @@ public class CreateActionItemActivity extends AppCompatActivity {
                     mPayerView.setText(strs[3]);
                     mTotalView.setText(strs[4].split("\\:")[1]);
                     mAverageView.setText(strs[5]);
-                    Log.i(TAG, "loadItems: " + strs[0] + strs[1] + strs[2] + strs[3] + strs[4]);
+//                    Log.i(TAG, "loadItems: " + strs[0] + strs[1] + strs[2] + strs[3] + strs[4]);
                     break;
                 }
             }
@@ -235,7 +299,7 @@ public class CreateActionItemActivity extends AppCompatActivity {
     public void showAlertDialog(){
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setTitle("警告");
-        alertDialogBuilder.setIcon(android.R.drawable.ic_dialog_dialer);
+        alertDialogBuilder.setIcon(android.R.drawable.ic_dialog_alert);
         alertDialogBuilder.setMessage("切换后将重置本页面，确定要切换吗？");
         alertDialogBuilder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
             @Override
@@ -371,12 +435,12 @@ public class CreateActionItemActivity extends AppCompatActivity {
 
 
     String[] mMembersToDialog;
-    boolean selectedAll = false;
     int mSelectedMembersNum = 0;
     // 多选提示框
     private AlertDialog alertDialog3;
     public void showMembersAlertDialog(final View view){
 //        final String[] items = {"Struts2","Spring","Hibernate","Mybatis","Spring MVC"};
+
 
         // 创建一个AlertDialog建造者
         AlertDialog.Builder alertDialogBuilder= new AlertDialog.Builder(this);
@@ -395,7 +459,6 @@ public class CreateActionItemActivity extends AppCompatActivity {
                 if (isChecked) {
                     // 选中
                     if (which == mMembersToDialog.length -1) {
-                        selectedAll = true;
                         selectAll(alertDialog3, true);
                     } else {
                         selectMember(which);
@@ -404,10 +467,15 @@ public class CreateActionItemActivity extends AppCompatActivity {
                 }else {
                     // 取消选中
                     if (which == mMembersToDialog.length -1) {
-                        selectedAll = false;
                         selectAll(alertDialog3, false);
                     } else {
                         unselectMember(which);
+
+                        if (selectedMemberIndex.contains(mMembersToDialog.length-1)){
+                            int index = selectedMemberIndex.indexOf(mMembersToDialog.length-1);
+                            selectedMemberIndex.remove(index);
+                            alertDialog3.getListView().setItemChecked(mMembersToDialog.length-1, false);
+                        }
 //                        Toast.makeText(CreateActionItemActivity.this, "取消选中"+ mMembers[which], Toast.LENGTH_SHORT).show();
                     }
                 }
@@ -424,18 +492,11 @@ public class CreateActionItemActivity extends AppCompatActivity {
 
                 Log.i(TAG, "onClick: THQ1 " + selectedMemberIndex.size());
 
-                if (selectedAll) {
-                    for (String s:mMembers) {
-                        mSelectedMenbers.append(s + ",");
-                    }
-                    selectedAll = false;
-                    mSelectedMembersNum = mMembers.length;
-                } else {
-                    for (Integer i : selectedMemberIndex) {
-                        mSelectedMenbers.append(mMembers[i] + ",");
-                    }
-                    mSelectedMembersNum = selectedMemberIndex.size();
+                for (Integer i : selectedMemberIndex) {
+                    if (i >= mMembers.length) break;
+                    mSelectedMenbers.append(mMembers[i] + ",");
                 }
+                mSelectedMembersNum = selectedMemberIndex.size();
                 ((TextView)view).setText("参与人:" + mSelectedMenbers);
                 // 关闭提示框
                 alertDialog3.dismiss();
@@ -551,6 +612,20 @@ public class CreateActionItemActivity extends AppCompatActivity {
         public void afterTextChanged(Editable s) {
             // TODO Auto-generated method stub
             Log.d("TAG","afterTextChanged--------------->");
+
+            String totalCost = mTotalView.getText().toString();
+            String payer = mPayerView.getText().toString();
+            if (totalCost.equals("") || mSelectedMembersNum == 0 || !payer.contains(":")) {
+                mAverageView.setText("Average");
+                return;
+            }
+
+            String[] strs2 = totalCost.split("\\+");
+            String[] strs3 = payer.split("\\:")[1].split("\\,");
+            if (strs3.length != strs2.length) {
+                mAverageView.setText("Average");
+                return;
+            }
             resetAverageView();
         }
 
@@ -568,9 +643,33 @@ public class CreateActionItemActivity extends AppCompatActivity {
         }
     };
 
-    private void resetAverageView() {
-        mAverageView.setText("Average");
+
+    @Override
+    protected Dialog onCreateDialog(int id) {
+        switch (id) {
+            case DATE_DIALOG:
+                return new DatePickerDialog(this, mdateListener, mYear, mMonth, mDay);
+        }
+        return null;
     }
+
+    private DatePickerDialog.OnDateSetListener mdateListener = new DatePickerDialog.OnDateSetListener() {
+
+        @Override
+        public void onDateSet(DatePicker view, int year, int monthOfYear,
+                              int dayOfMonth) {
+            mYear = year;
+            mMonth = monthOfYear;
+            mDay = dayOfMonth;
+            mCreateTimeView.setText(new StringBuffer().append("时间:").append(mYear).append("-").append(mMonth + 1).append("-").append(mDay));
+        }
+    };
+
+
+    private void resetAverageView() {
+        getAverage(mAverageView);
+    }
+
 
     public void getAverage(View view) {
         String totalCost = mTotalView.getText().toString();
@@ -621,7 +720,8 @@ public class CreateActionItemActivity extends AppCompatActivity {
             Log.i(TAG, "commit: THQ1 " + mItemsSet.size());
         mItemsSet.add(/*String.valueOf(mItemsSet.size())+*/"消费项:" + mItemNameView.getText().toString() + "#" + mActionNameView.getText().toString()
                 + "#" + mSelectedMembersView.getText().toString() + "#" + mPayerView.getText().toString()
-                + "#" + "总共:" + mTotalView.getText().toString() + "#" + mAverageView.getText().toString());
+                + "#" + "总共:" + mTotalView.getText().toString() + "#" + mAverageView.getText().toString()
+                + "#" + mCreateTimeView.getText().toString());
 //        int i = 1;
 //        for (String s:mItemsSet ) {
 //            Log.i(TAG, "commit: THQ1 " + s);

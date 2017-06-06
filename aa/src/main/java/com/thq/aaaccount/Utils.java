@@ -46,6 +46,11 @@ public class Utils {
         return null;
     }
 
+    static public String getActivityNameFromId(String id) {
+        SharedPreferences sp = mContext.getSharedPreferences("activity"+id, Context.MODE_PRIVATE);
+        return sp.getString("ActionName", null);
+    }
+
     static public Set<String> getAllActivity() {
         SharedPreferences sp = mContext.getSharedPreferences("allactivity", Context.MODE_PRIVATE);
         return sp.getStringSet("allactivitys", null);

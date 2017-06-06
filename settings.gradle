@@ -1,1 +1,1 @@
-include ':aa'
+include ':aa', ':library'
