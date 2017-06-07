@@ -113,6 +113,7 @@
         android:layout_marginLeft="@dimen/child_view_margin"
         android:layout_marginRight="@dimen/child_view_margin"
         android:onClick="commit"
+        android:background="@color/primary"
         android:id="@+id/button5"
          />
 

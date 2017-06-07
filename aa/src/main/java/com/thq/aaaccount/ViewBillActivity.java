@@ -124,6 +124,7 @@ public class ViewBillActivity extends AppCompatActivity {
                 String[] strs4 = item1.mTotal.split("\\+");
                 for (int i = 0; i < strs3.length; i++) {
                     Member member = mMembers.get(strs3[i]);
+                    if (member == null) continue;
                     if (i > strs4.length - 1) {
                         member.mPay += 0;
                     } else {
@@ -132,6 +133,7 @@ public class ViewBillActivity extends AppCompatActivity {
                 }
                 for (String m:strs2) {
                     Member member = mMembers.get(m);
+                    if (member == null) continue;
                     member.mCost += item1.mAverage;
                     member.mJoinedItems.add(item1.mItemName);
                 }
@@ -265,7 +267,8 @@ public class ViewBillActivity extends AppCompatActivity {
         public void onBindViewHolder(ViewHolder holder, int position) {
             // - get element from your dataset at this position
             // - replace the contents of the view with that element
-            if (mDataset.size()-1 == position) {
+//            Log.i(TAG, "onBindViewHolder: position = " + position);
+            if (mDataset.size() - 1 == position) {
                 holder.mName.setVisibility(View.INVISIBLE);
                 holder.mJoindItem.setVisibility(View.GONE);
                 holder.mPay.setText("总预付:" + mTotalPrepaid);
@@ -273,6 +276,9 @@ public class ViewBillActivity extends AppCompatActivity {
 //                holder.mTotal.setVisibility(View.GONE);
                 holder.mTotal.setText("总支付:" + mTotalPay);
             } else {
+
+                holder.mName.setVisibility(View.VISIBLE);
+                holder.mJoindItem.setVisibility(View.VISIBLE);
                 Member pat = mDataset.get(position);
 //            holder.mTextView.setText(pat.patName);
                 holder.mName.setText(pat.mName);
@@ -283,6 +289,8 @@ public class ViewBillActivity extends AppCompatActivity {
 
 //                Log.i(TAG, "onBindViewHolder: THQ");
             }
+
+//            Log.i(TAG, "onBindViewHolder: name = " + mDataset.get(position).mName);
         }
 
         // Return the size of your dataset (invoked by the layout manager)

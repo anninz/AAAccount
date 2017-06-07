@@ -135,10 +135,11 @@ public class CreateActionItemActivity extends AppCompatActivity {
         mActionNameView.setText("所属活动:" + mActivityName);
         if (mIsEditMode) {
             loadItemsToView(itemName);
-        }
+        } else {
 
+            intiMembers();
+        }
         initDatePicker();
-        intiMembers();
     }
 
     private void initDatePicker() {
@@ -146,7 +147,9 @@ public class CreateActionItemActivity extends AppCompatActivity {
         mYear = ca.get(Calendar.YEAR);
         mMonth = ca.get(Calendar.MONTH);
         mDay = ca.get(Calendar.DAY_OF_MONTH);
-        mCreateTimeView.setText(new StringBuffer().append("时间:").append(mYear).append("-").append(mMonth + 1).append("-").append(mDay));
+        if (!mIsEditMode) {
+            mCreateTimeView.setText(new StringBuffer().append("时间:").append(mYear).append("-").append(mMonth + 1).append("-").append(mDay));
+        }
     }
 
     public void showDatePicker(View view) {
@@ -222,6 +225,7 @@ public class CreateActionItemActivity extends AppCompatActivity {
                     mPayerView.setText(strs[3]);
                     mTotalView.setText(strs[4].split("\\:")[1]);
                     mAverageView.setText(strs[5]);
+                    mCreateTimeView.setText(strs[6]);
 //                    Log.i(TAG, "loadItems: " + strs[0] + strs[1] + strs[2] + strs[3] + strs[4]);
                     break;
                 }

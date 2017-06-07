@@ -31,6 +31,7 @@
         android:layout_alignTop="@+id/textInputPatNum"
         android:layout_toRightOf="@+id/textInputPatNum"
         android:layout_marginRight="@dimen/child_view_margin_short"
+        android:background="@color/primary"
         android:onClick="createActionDone"
         android:id="@+id/add_action"
         />
@@ -69,7 +70,7 @@
             android:autoLink="all"
             android:layout_gravity="bottom"
             android:onClick="importMembers"
-            android:textColor="@color/google_yellow"
+            android:textColor="@color/primary_dark"
             android:layout_marginBottom="@dimen/child_view_margin_short"
             android:layout_weight="1" />
 

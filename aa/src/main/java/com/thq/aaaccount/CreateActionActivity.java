@@ -231,7 +231,7 @@ public class CreateActionActivity extends AppCompatActivity {
                 // TODO Auto-generated method stub
                 if (mAdd.getText().toString().equals("-")){
                     mAdd.setText("√");
-                    mAdd.setTextColor(CreateActionActivity.this.getResources().getColor(android.R.color.holo_green_light));
+                    mAdd.setTextColor(CreateActionActivity.this.getResources().getColor(R.color.primary_dark));
                 }
             }
 
@@ -364,7 +364,7 @@ public class CreateActionActivity extends AppCompatActivity {
             if (pat.mName.equals("")) {
                 holder.mMemberName.requestFocus();
                 holder.mAdd.setText("+");
-                holder.mAdd.setTextColor(CreateActionActivity.this.getResources().getColor(android.R.color.holo_green_light));
+                holder.mAdd.setTextColor(CreateActionActivity.this.getResources().getColor(R.color.primary_dark));
             } else {
                 holder.mAdd.setTextColor(CreateActionActivity.this.getResources().getColor(android.R.color.holo_red_light));
                 holder.mAdd.setText("-");

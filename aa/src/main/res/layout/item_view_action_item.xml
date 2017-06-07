@@ -69,7 +69,7 @@
             android:layout_width="28dp"
             android:layout_height="20dp"
             android:layout_marginLeft="1dp"
-            android:textColor="@android:color/holo_green_dark"
+            android:textColor="@color/primary_dark"
             android:id="@+id/button8"
             android:background="@color/list_item"
             android:layout_weight="0.1" />
