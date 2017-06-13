@@ -59,7 +59,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/add_menber"
-        android:background="@color/list_item"
+        android:textSize="28sp"
+        style="@style/ActionButton.Overflow"
         android:textColor="@color/primary_dark"
         />
     <!--<EditText-->

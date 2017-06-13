@@ -73,6 +73,8 @@ public class CreateActionActivity extends AppCompatActivity {
     int mYear, mMonth, mDay;
     final int DATE_DIALOG = 1;
 
+    boolean mIsNeedHintHostName = true;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -100,8 +102,8 @@ public class CreateActionActivity extends AppCompatActivity {
 
         mActionNameView = (EditText) findViewById(R.id.edit_text_action_name);
         mPrepaid = (EditText) findViewById(R.id.edit_text_host_name);
-        TextView textView = (TextView) findViewById(R.id.import_members);
-        textView.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG);
+//        TextView textView = (TextView) findViewById(R.id.import_members);
+//        textView.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG);
 
         //RecyclerView
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
@@ -232,6 +234,10 @@ public class CreateActionActivity extends AppCompatActivity {
                 if (mAdd.getText().toString().equals("-")){
                     mAdd.setText("√");
                     mAdd.setTextColor(CreateActionActivity.this.getResources().getColor(R.color.primary_dark));
+                }
+                if (mIsNeedHintHostName) {
+                    Toast.makeText(CreateActionActivity.this, "第一个成员默认是活动组织者！", Toast.LENGTH_LONG).show();
+                    mIsNeedHintHostName = false;
                 }
             }
 
@@ -389,7 +395,7 @@ public class CreateActionActivity extends AppCompatActivity {
     public void createActionDone(View v) {
         String activityName = mActionNameView.getText().toString();
         if (activityName.equals("") || myDataset.size() <= 1) {
-            Toast.makeText(this, "请填写完整信息！", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "必须填写活动名，且至少添加一位成员并点击+后，才能生成活动！", Toast.LENGTH_LONG).show();
             return;
         }
         if (mActivitySet != null && !(mIsEditMode && activityName.equals(mActivityName))) {
@@ -401,6 +407,9 @@ public class CreateActionActivity extends AppCompatActivity {
             }
         }
 
+
+        if (mActivitySet == null) mActivitySet = new HashSet<>();
+
         String selectedItem = null;
         for (String s : mActivitySet) {
             if (s.split("\\#")[0].equals(mActivityName)) {
@@ -411,8 +420,7 @@ public class CreateActionActivity extends AppCompatActivity {
         if (mIsEditMode) {
             int activitynums = Integer.parseInt(mActivityId) -1;
 
-            if (mActivitySet == null) mActivitySet = new HashSet<>();
-
+//            if (mActivitySet == null) mActivitySet = new HashSet<>();
 
             mActivitySet.remove(selectedItem);
 
@@ -437,7 +445,7 @@ public class CreateActionActivity extends AppCompatActivity {
         } else {
             int activitynums = mActivitySP.getInt("activitynums", -1);
 
-            if (mActivitySet == null) mActivitySet = new HashSet<>();
+//            if (mActivitySet == null) mActivitySet = new HashSet<>();
             mActivitySet.add(activityName + "#" + (activitynums + 1) + "#" +
                     new StringBuffer().append(mYear).append("-").append(mMonth + 1).append("-").append(mDay)
                     + "#" + myDataset.get(0).mName
@@ -465,7 +473,7 @@ public class CreateActionActivity extends AppCompatActivity {
 
     public void importMembers(View view) {
         if (mMembers == null) {
-            Toast.makeText(this, "暂没有常用联系人！", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "暂没有常用联系人，输入活动成员后，将自动存储为常用联系人！", Toast.LENGTH_LONG).show();
             return;
         }
         mMultiAlertDialog.showMembersAlertDialog(mMembers, mSelectedMembers, new MultiAlertDialog.CallbackResultListener() {

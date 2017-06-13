@@ -59,4 +59,12 @@
         <item name="android:fontFamily" tools:ignore="NewApi">sans-serif-light</item>
     </style>
 
+
+    <!--修改toolbar菜单按钮的style-->
+    <style name="OverflowButtonStyle" parent="@android:style/Widget.ActionButton.Overflow">
+        <item name="android:src">@color/primary</item>
+    </style>-->
+    <!--toolbar菜单按钮的颜色-->
+    <style name="ActionButton.Overflow" parent="android:style/Widget.Holo.Light.ActionButton.Overflow">
+    </style>
 </resources>
