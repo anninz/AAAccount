@@ -3,6 +3,7 @@ package com.thq.aaaccount;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -18,6 +19,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.thq.aaaccount.Utils.Utils;
 import com.thq.aaaccount.widget.DividerItemDecoration;
 import com.thq.aaaccount.widget.RecyclerItemClickListener;
 
@@ -75,7 +77,9 @@ public class ViewActionItemActivity extends AppCompatActivity {
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST));
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST);
+        dividerItemDecoration.setmDivider(getDrawable(R.drawable.list_divider));
+        mRecyclerView.addItemDecoration(dividerItemDecoration);
         mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, onItemClickListener));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
@@ -106,43 +110,14 @@ public class ViewActionItemActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        for (ViewHolder viewHolder:mHolder) {
-//            if (viewHolder.patNum > 0) {
-//                StringBuffer stringBuffer = new StringBuffer();
-//                stringBuffer.append(viewHolder.patNum + "#");
-//                stringBuffer.append(viewHolder.apkPath + "#");
-////                stringBuffer.append(viewHolder.mTextView.getText().toString());
-//                mSet.add(stringBuffer.toString());
-//            }
-/*
-            if (viewHolder.mCheckBox.isChecked()) {
-                StringBuffer stringBuffer = new StringBuffer();
-                stringBuffer.append(viewHolder.mEditText.getText().toString() + "#");
-                stringBuffer.append(viewHolder.apkPath + "#");
-                stringBuffer.append(viewHolder.mTextView.getText().toString());
-                mSet.add(stringBuffer.toString());
-            }
-*/
-        }
-//        setSPSet("PatSet", mSet);
-    }
-
     private void loadItems() {
-//        mSP = null;
-//        mSP = getSharedPreferences("activity" + mActivityId, Context.MODE_PRIVATE);
-//        mSet = null;
-//        mSet = new HashSet<>();
-//        mSet =  mSP.getStringSet("Items", null);
         mSet =  Utils.getSPSet("Items", null, mActivityFileName);
         mSet = sortByValue(mSet);
         if (mSet != null) {
             for (String item : mSet) {
                 String[] strs = item.split("\\#");
 //                Log.i(TAG, "loadItems: " + strs[0] + strs[1] + strs[2] + strs[3] + strs[4]);
-                Item item1 = new Item(strs[0], strs[2], strs[3], strs[4], strs[5]);
+                Item item1 = new Item(strs[0], strs[2], strs[3], strs[4], strs[5], "备注：" + (strs.length > 7?strs[7]:null));
                 myDataset.add(item1);
             }
         }
@@ -206,12 +181,20 @@ public class ViewActionItemActivity extends AppCompatActivity {
         public String mPayMan;
         public String mTotal;
         public String mAverage;
-        Item (String actionName, String members, String payMan, String total, String average) {
-            mItemName = actionName;
-            mMembers = members;
-            mPayMan = payMan;
-            mTotal = total;
-            mAverage = average;
+        public String mSummary;
+        public Drawable mIcon;
+
+        public Item(String mItemName, String mMembers, String mPayMan, String mTotal, String mAverage, String mSummary) {
+            this.mItemName = mItemName;
+            this.mMembers = mMembers;
+            this.mPayMan = mPayMan;
+            this.mTotal = mTotal;
+            this.mAverage = mAverage;
+            this.mSummary = mSummary;
+
+            mIcon=getResources().getDrawable(ItemPickerDialog.getIntance().getItem(mItemName).mIconNormalId);
+            mIcon.setBounds(0, 0, mIcon.getMinimumWidth(), mIcon.getMinimumHeight());
+
         }
     }
 
@@ -229,6 +212,7 @@ public class ViewActionItemActivity extends AppCompatActivity {
         public TextView mItemName;
         public TextView mMembers;
         public TextView mPayMan;
+        public TextView mSummaryView;
         public TextView mTotal;
         public TextView mAverage;
         public Button mDelete;
@@ -240,6 +224,7 @@ public class ViewActionItemActivity extends AppCompatActivity {
             mPayMan = (TextView) v.findViewById(R.id.view_payer);
             mItemName = (TextView) v.findViewById(R.id.view_item_name);
             mMembers = (TextView) v.findViewById(R.id.view_members);
+            mSummaryView = (TextView) v.findViewById(R.id.view_summary);
             mTotal = (TextView) v.findViewById(R.id.view_total);
             mAverage = (TextView) v.findViewById(R.id.view_average);
             mDelete = (Button) v.findViewById(R.id.button7);
@@ -333,7 +318,8 @@ public class ViewActionItemActivity extends AppCompatActivity {
             holder.mMembers.setText(pat.mMembers);
             holder.mTotal.setText(pat.mTotal);
             holder.mPayMan.setText(pat.mPayMan);
-            Log.i(TAG, "onBindViewHolder: THQ");
+            holder.mSummaryView.setText(pat.mSummary);
+            holder.mItemName.setCompoundDrawables(pat.mIcon, null, null, null);
         }
 
         // Return the size of your dataset (invoked by the layout manager)
@@ -362,7 +348,7 @@ public class ViewActionItemActivity extends AppCompatActivity {
 
     public void getBill(View view) {
         if (Utils.getSPSet("Members", null, mActivityFileName) != null) {
-            Intent intent = new Intent(ViewActionItemActivity.this, ViewBillActivity.class);
+            Intent intent = new Intent(ViewActionItemActivity.this, BillFragmentActivity.class);
             intent.putExtra("activityId", mActivityId);
             startActivity(intent);
         } else {

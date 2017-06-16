@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -19,6 +20,8 @@ import android.widget.DatePicker;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.thq.aaaccount.Utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -55,6 +58,7 @@ public class CreateActionItemActivity extends AppCompatActivity {
     TextView mAverageView;
     TextView mSelectedMembersView;
     TextView mPayerView;
+    TextView mSummaryView;
 
     boolean mIsEditMode = false;
     String mActivityFileName = null;
@@ -64,6 +68,8 @@ public class CreateActionItemActivity extends AppCompatActivity {
 
     int mYear, mMonth, mDay;
     final int DATE_DIALOG = 1;
+
+    ItemPickerDialog mItemPickerDialog;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -94,6 +100,7 @@ public class CreateActionItemActivity extends AppCompatActivity {
         mAverageView = (TextView) findViewById(R.id.average);
         mPayerView = (TextView) findViewById(R.id.payer);
         mSelectedMembersView = (TextView) findViewById(R.id.members);
+        mSummaryView = (TextView) findViewById(R.id.item_summary);
 
         mPayerView.addTextChangedListener(textWatcher);
         mTotalView.addTextChangedListener(textWatcher);
@@ -140,6 +147,23 @@ public class CreateActionItemActivity extends AppCompatActivity {
             intiMembers();
         }
         initDatePicker();
+
+        mItemNameView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ItemPickerDialog.getIntance().showItemAlertDialog(CreateActionItemActivity.this, new ItemPickerDialog.CallbackResultListener() {
+                    @Override
+                    public void done(int position) {
+                        ItemPickerDialog.Item item = ItemPickerDialog.getIntance().getItem(position);
+                        mItemNameView.setText(item.mItemName);
+
+                        Drawable nav_up=getResources().getDrawable(item.mIconNormalId);
+                        nav_up.setBounds(0, 0, nav_up.getMinimumWidth(), nav_up.getMinimumHeight());
+                        mItemNameView.setCompoundDrawables(nav_up, null, null, null);
+                    }
+                });
+            }
+        });
     }
 
     private void initDatePicker() {
@@ -219,13 +243,14 @@ public class CreateActionItemActivity extends AppCompatActivity {
                 if (item.contains(key)) {
                     selectedItem = item;
                     String[] strs = item.split("\\#");
-                    mItemNameView.setText(strs[0].split("\\:")[1]);
+                    mItemNameView.setText(strs[0]/*.split("\\:")[1]*/);
                     mSelectedMembersView.setText(strs[2]);
                     mSelectedMembersNum = strs[2].split("\\,").length;
                     mPayerView.setText(strs[3]);
                     mTotalView.setText(strs[4].split("\\:")[1]);
                     mAverageView.setText(strs[5]);
                     mCreateTimeView.setText(strs[6]);
+                    mSummaryView.setText(strs.length > 7?strs[7]:null);
 //                    Log.i(TAG, "loadItems: " + strs[0] + strs[1] + strs[2] + strs[3] + strs[4]);
                     break;
                 }
@@ -722,10 +747,10 @@ public class CreateActionItemActivity extends AppCompatActivity {
 
         mItemsSet.remove(selectedItem);
             Log.i(TAG, "commit: THQ1 " + mItemsSet.size());
-        mItemsSet.add(/*String.valueOf(mItemsSet.size())+*/"消费项:" + mItemNameView.getText().toString() + "#" + mActionNameView.getText().toString()
+        mItemsSet.add(/*String.valueOf(mItemsSet.size())+"消费项:" + */mItemNameView.getText().toString() + "#" + mActionNameView.getText().toString()
                 + "#" + mSelectedMembersView.getText().toString() + "#" + mPayerView.getText().toString()
                 + "#" + "总共:" + mTotalView.getText().toString() + "#" + mAverageView.getText().toString()
-                + "#" + mCreateTimeView.getText().toString());
+                + "#" + mCreateTimeView.getText().toString() + "#" + mSummaryView.getText().toString());
 //        int i = 1;
 //        for (String s:mItemsSet ) {
 //            Log.i(TAG, "commit: THQ1 " + s);

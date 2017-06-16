@@ -1,4 +1,4 @@
-package com.thq.aaaccount;
+package com.thq.aaaccount.Utils;
 
 import android.app.Activity;
 import android.content.Context;

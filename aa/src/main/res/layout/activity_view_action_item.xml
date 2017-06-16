@@ -40,7 +40,7 @@
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/child_view_margin_top"
+            android:layout_marginTop="@dimen/child_view_margin_top_70"
             android:layout_marginLeft="@dimen/child_view_margin_short"
             android:layout_marginRight="@dimen/child_view_margin_short"
             android:scrollbars="none"

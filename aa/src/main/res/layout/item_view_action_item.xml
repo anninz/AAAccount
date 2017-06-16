@@ -2,9 +2,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="95dp"
-    android:layout_marginLeft="6dp"
-    android:layout_marginRight="6dp"
+    android:layout_height="135dp"
+    android:layout_marginLeft="@dimen/child_view_margin_short"
+    android:layout_marginRight="@dimen/child_view_margin_short"
+    android:layout_marginTop="@dimen/child_view_margin_4dp"
+    android:layout_marginBottom="@dimen/child_view_margin_4dp"
     android:clickable="true"
     android:background="@drawable/news_item"
     android:gravity="center_vertical"
@@ -14,7 +16,9 @@
     <TextView
         android:text="TextView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="24dp"
+        android:textSize="16sp"
+        android:gravity="center_vertical"
         android:textColor="@color/primary_dark"
         android:id="@+id/view_item_name"
         android:layout_weight="0.07" />
@@ -31,6 +35,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/view_payer"
+        android:layout_weight="0.07" />
+
+    <TextView
+        android:text="备注："
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/view_summary"
+        android:maxLines="1"
         android:layout_weight="0.07" />
 
     <LinearLayout
