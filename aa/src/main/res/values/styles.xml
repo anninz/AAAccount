@@ -11,6 +11,9 @@
     </style>
 
     <style name="AppTheme" parent="BaseAppTheme" />
+    <style name="AppThemeLight" parent="BaseAppTheme" >
+        <item name="android:windowBackground">@color/white</item>
+    </style>
 
     <declare-styleable name="ShadowLayout">
         <attr name="sl_cornerRadius" format="dimension"/>

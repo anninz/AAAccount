@@ -154,7 +154,7 @@ public class CreateActionItemActivity extends AppCompatActivity {
                 ItemPickerDialog.getIntance().showItemAlertDialog(CreateActionItemActivity.this, new ItemPickerDialog.CallbackResultListener() {
                     @Override
                     public void done(int position) {
-                        ItemPickerDialog.Item item = ItemPickerDialog.getIntance().getItem(position);
+                        ItemPickerDialog.Item item = ItemPickerDialog.getIntance().getItem(position, true);
                         mItemNameView.setText(item.mItemName);
 
                         Drawable nav_up=getResources().getDrawable(item.mIconNormalId);

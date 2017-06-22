@@ -61,6 +61,7 @@ public class ViewActionItemActivity extends AppCompatActivity {
         if (extras != null) {
             mActivityId = extras.getString("activityId");
         }
+        if ("".equals(mActivityId) || mActivityId == null) mActivityId = String.valueOf(Utils.getLastestActivityId());
         mActivityFileName = "activity" + mActivityId;//Utils.getIdFromActivityName(this, activityName);
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -94,6 +95,9 @@ public class ViewActionItemActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
+
+        if ("".equals(mActivityId) || mActivityId == null) mActivityId = String.valueOf(Utils.getLastestActivityId());
+        mActivityFileName = "activity" + mActivityId;//Utils.getIdFromActivityName(this, activityName);
         myDataset.clear();
         loadItems();
         if (myDataset.size() == 0) {
@@ -356,4 +360,15 @@ public class ViewActionItemActivity extends AppCompatActivity {
         }
     }
 
+
+    public void createAction(View view) {
+        Intent intent = new Intent(this, CreateActionActivity.class);
+        startActivity(intent);
+    }
+
+    public void gotoAllAction(View view) {
+        Intent intent = new Intent(this, ViewAllActionActivity.class);
+//        intent.putExtra("activityId", ""+Utils.getLastestActivityId(this));
+        startActivity(intent);
+    }
 }

@@ -1,30 +1,44 @@
 package com.thq.aaaccount;
 
 import android.Manifest;
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.thq.aaaccount.Utils.Utils;
+import com.thq.aaaccount.base.BaseActivity;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
 
     private Toolbar mToolbar;
 
+
+    private CardView basicCard;
+    private CardView highCard;
+    private CardView useCard;
+
+    private ImageView basicImage;
+    private ImageView highImage;
+    private ImageView useImage;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+//        setContentView(R.layout.activity_main);
 
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -35,11 +49,11 @@ public class MainActivity extends AppCompatActivity {
             Utils.setSPInt("activitynums", 0, "allactivity");
         }
 
-        image1 = (ImageView) findViewById(R.id.image);
-        //初始化时显示第一张图片
-        image1.setImageResource(R.drawable.pic5);
-//        runImage();
-
+//        image1 = (ImageView) findViewById(R.id.image);
+//        //初始化时显示第一张图片
+//        image1.setImageResource(R.drawable.pic5);
+////        runImage();
+//
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
             String[] strings =  {Manifest.permission.WRITE_EXTERNAL_STORAGE};
@@ -47,7 +61,73 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void createAction(View view) {
+    @Override
+    public int getLayoutId() {
+        return R.layout.activity_main;
+    }
+
+    @Override
+    public void initView() {
+        basicCard = (CardView) findViewById(R.id.cv_main_basic);
+        highCard = (CardView) findViewById(R.id.cv_main_high);
+        useCard = (CardView) findViewById(R.id.cv_main_use);
+
+        basicImage = (ImageView) findViewById(R.id.iv_main_basic);
+        highImage = (ImageView) findViewById(R.id.iv_main_high);
+        useImage = (ImageView) findViewById(R.id.iv_main_use);
+    }
+
+    @Override
+    public void initData() {
+        Glide.with(this).load(R.mipmap.heng_3).into(basicImage);
+        Glide.with(this).load(R.mipmap.heng_1).into(highImage);
+        Glide.with(this).load(R.mipmap.heng_4).into(useImage);
+    }
+
+    @Override
+    public void initListener() {
+        basicCard.setOnClickListener(this);
+        highCard.setOnClickListener(this);
+        useCard.setOnClickListener(this);
+    }
+
+
+    @Override
+    public void processClick(View v) {
+        switch (v.getId()) {
+            case R.id.cv_main_basic:
+                Intent i1 = new Intent(this, PersonalFragmentActivity.class);
+                startActivity(i1, ActivityOptions.makeSceneTransitionAnimation(this, basicCard, "personal").toBundle());
+                break;
+            case R.id.cv_main_high:
+                Intent i2 = new Intent(this, ViewActionItemActivity.class);
+                startActivity(i2, ActivityOptions.makeSceneTransitionAnimation(this, highCard, "all").toBundle());
+                break;
+            case R.id.cv_main_use:
+                Intent i3 = new Intent(this, AboutActivity.class);
+                startActivity(i3, ActivityOptions.makeSceneTransitionAnimation(this, useCard, "about").toBundle());
+                break;
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+//        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+//        switch (item.getItemId()) {
+//            case R.id.menu_main_about:
+//                Intent intent = new Intent(this, AboutActivity.class);
+//                startActivity(intent);
+//                return true;
+//        }
+        return super.onOptionsItemSelected(item);
+    }
+
+ /*   public void createAction(View view) {
         Intent intent = new Intent(MainActivity.this, CreateActionActivity.class);
         startActivity(intent);
     }
@@ -77,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, "请先创建活动", Toast.LENGTH_SHORT).show();
         }
-    }
+    }*/
 
 
     private void runImage() {

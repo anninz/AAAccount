@@ -1,0 +1,78 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:gravity="center"
+        android:layout_marginTop="@dimen/child_view_margin_short"
+        android:id="@+id/layout"
+        android:orientation="horizontal">
+        <RelativeLayout
+            android:id="@+id/rlLeft"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="6dp"
+            android:paddingRight="6dp"
+            android:layout_marginLeft="@dimen/child_view_margin_short"
+            android:paddingTop="6dp"
+            android:layout_weight="1">
+
+            <TextView
+                android:id="@+id/tvTotalHead"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="结余"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tvTotalContent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tvTotalHead"
+                android:layout_marginTop="5dp"
+                android:text="123"
+                android:textColor="@android:color/black"
+                android:textSize="18sp"/>
+        </RelativeLayout>
+
+        <TextView
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="@dimen/child_view_margin_short"
+            android:gravity="center"
+            android:text="转账"
+            android:background="@drawable/top_text_backgrand"/>
+
+        <TextView
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="@dimen/child_view_margin_short"
+            android:gravity="center"
+            android:text="添加"
+            android:background="@drawable/top_text_backgrand"/>
+
+    </LinearLayout>
+
+    <com.thq.aaaccount.PullToRefreshView
+        android:id="@+id/pull_to_refresh"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/layout"
+        android:layout_marginTop="@dimen/child_view_margin_short"
+        >
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/child_view_margin_short"
+        android:layout_marginRight="@dimen/child_view_margin_short"
+        android:scrollbars="none"
+        android:background="@color/list_item"
+        />
+</com.thq.aaaccount.PullToRefreshView>
+
+</RelativeLayout>

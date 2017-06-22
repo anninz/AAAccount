@@ -78,7 +78,7 @@ public abstract class ChartUtils {
     }
 
     static {
-        COLORS = new int[]{COLOR_BLUE, COLOR_VIOLET, COLOR_GREEN, COLOR_ORANGE, COLOR_RED, Color.DKGRAY, Color.GRAY, Color.LTGRAY, Color.YELLOW, Color.CYAN, Color.MAGENTA, Color.YELLOW};
+        COLORS = new int[]{COLOR_BLUE, COLOR_VIOLET, COLOR_GREEN, COLOR_ORANGE, COLOR_RED, Color.LTGRAY, Color.YELLOW, Color.CYAN, Color.MAGENTA, Color.YELLOW};
         COLOR_INDEX = 0;
     }
 }

@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class Fragment_0 extends Fragment {
+public class Fragment_ABill extends Fragment {
 
     private static final String TAG = "THQ MainActivity";
 

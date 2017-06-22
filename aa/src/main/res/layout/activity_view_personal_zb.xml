@@ -1,0 +1,169 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:cube_ptr="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="90dp"
+        android:gravity="center"
+        android:layout_marginTop="@dimen/child_view_margin_short"
+        android:id="@+id/layout"
+        android:orientation="horizontal">
+        <RelativeLayout
+            android:id="@+id/rlLeft"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="6dp"
+            android:paddingRight="6dp"
+            android:paddingTop="35dp"
+            android:layout_weight="1">
+
+            <TextView
+                android:id="@+id/tvIncomeHead"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:gravity="right"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/tvIncomeContent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:gravity="right"
+                android:layout_below="@id/tvIncomeHead"
+                android:layout_marginTop="5dp"
+                android:textSize="22sp"/>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/rlTimeline"
+            android:layout_width="112dp"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/tvTopText"
+                android:layout_width="match_parent"
+                android:layout_height="32dp"
+                android:gravity="center"
+                android:layout_centerHorizontal="true"
+                android:background="@drawable/top_text_backgrand"
+                android:textSize="10sp"/>
+
+            <TextView
+                android:layout_width="0.5dp"
+                android:layout_height="40dp"
+                android:layout_below="@id/tvTopText"
+                android:layout_centerHorizontal="true"
+                android:background="#999" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/rlCenter"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="6dp"
+            android:paddingRight="6dp"
+            android:paddingTop="35dp"
+            android:layout_weight="1">
+
+            <TextView
+                android:id="@+id/tvExpendHead"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/tvExpendContent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tvExpendHead"
+                android:layout_marginTop="5dp"
+                android:textSize="22sp" />
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <com.thq.aaaccount.PullToRefreshView
+        android:id="@+id/pull_to_refresh"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/layout"
+        android:layout_marginTop="@dimen/child_view_margin_short"
+        >
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/child_view_margin_short"
+        android:layout_marginRight="@dimen/child_view_margin_short"
+        android:scrollbars="none"
+        android:background="@color/list_item"
+        />
+</com.thq.aaaccount.PullToRefreshView>
+
+    <com.thq.aaaccount.refresh_view.AddBtnCircleView
+        android:id="@+id/add_p_bill"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="78dp"
+        android:onClick="addItem"/>
+
+    <TextView
+        android:text="@string/null_item_hint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/child_view_margin_short"
+        android:layout_marginRight="@dimen/child_view_margin_short"
+        android:layout_centerVertical="true"
+        android:textColor="@android:color/darker_gray"
+        android:gravity="center"
+        android:visibility="gone"
+        android:id="@+id/action_hint" />
+
+
+    <com.github.clans.fab.FloatingActionMenu
+        android:id="@+id/menu_labels_right"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:paddingRight="10dp"
+        android:paddingBottom="10dp"
+        android:paddingLeft="10dp"
+        fab:menu_labels_ellipsize="end"
+        fab:menu_labels_singleLine="true"
+        fab:menu_backgroundColor="#ccffffff"
+        fab:menu_labels_position="left">
+
+        <com.github.clans.fab.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_edit"
+            android:onClick="addItem"
+            fab:fab_size="mini"
+            fab:fab_label="新增" />
+
+        <com.github.clans.fab.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_edit"
+            fab:fab_size="mini"
+            fab:fab_label="搜索" />
+
+        <com.github.clans.fab.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_edit"
+            android:id="@+id/menu_labels_totop"
+            fab:fab_size="mini"
+            fab:fab_label="顶部" />
+
+    </com.github.clans.fab.FloatingActionMenu>
+
+</RelativeLayout>

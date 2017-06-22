@@ -2,7 +2,6 @@ package com.thq.aaaccount;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Handler;
 import android.support.v7.app.AlertDialog;
@@ -34,7 +33,8 @@ public class ItemPickerDialog {
 
     private RecyclerView mRecyclerView;
     private GridLayoutManager mGridManager;
-    private List<Item> myDataset;
+    private List<Item> myExpendset;
+    private List<Item> myIncomeset;
     private MyAdapter mAdapter;
     View mView;
 
@@ -57,9 +57,14 @@ public class ItemPickerDialog {
 
 //        initName();
 
-        myDataset = new ArrayList<>();
-        for (int i = 0; i < ITEM_NAME.length; i++) {
-            myDataset.add(new Item(ITEM_NAME[i], ITEM_ICON_NORMAL_ID[i], ITEM_ICON_SELECTED_ID[i]));
+        myExpendset = new ArrayList<>();
+        for (int i = 0; i < ITEM_EXPEND_NAME.length; i++) {
+            myExpendset.add(new Item(ITEM_EXPEND_NAME[i], ITEM_EXPEND_ICON_NORMAL_ID[i], ITEM_EXPEND_ICON_SELECTED_ID[i]));
+        }
+
+        myIncomeset = new ArrayList<>();
+        for (int i = 0; i < ITEM_INCOME_NAME.length; i++) {
+            myIncomeset.add(new Item(ITEM_INCOME_NAME[i], ITEM_INCOME_ICON_NORMAL_ID[i], ITEM_INCOME_ICON_SELECTED_ID[i]));
         }
         initItemPicker();
     }
@@ -126,19 +131,52 @@ public class ItemPickerDialog {
             "zuf"
     };*/
 
-    private static String[] ITEM_NAME = {
-            "餐饮",
-            "交通",
-            "电影",
-            "酒店",
+    public static String[] ITEM_NAME_TYPY = {
+            "餐饮#z",
+            "交通#z",
+            "电影#z",
+            "酒店#z",
+            "工资#s",
+            "购物#z",
+            "宠物#z",
+            "存款#s",
+            "打牌#s",
+            "股票#s",
+            "基金#s",
+            "麻将#s",
+            "KTV#z",
+            "话费#z",
+            "修理#z",
+            "学习#z",
+            "烟酒#z",
+            "药#z",
+            "医疗#z",
+            "婴儿#z",
+            "游戏#z",
+            "娱乐#z",
+            "运动#z",
+            "租房#z",
+            "避孕套#z",
+            "其他#z",
+            "自定义#z",
+    };
+
+    public static String[] ITEM_INCOME_NAME = {
             "工资",
-            "购物",
-            "宠物",
             "存款",
             "打牌",
             "股票",
             "基金",
             "麻将",
+    };
+
+    public static String[] ITEM_EXPEND_NAME = {
+            "餐饮",
+            "交通",
+            "电影",
+            "酒店",
+            "购物",
+            "宠物",
             "KTV",
             "话费",
             "修理",
@@ -156,19 +194,22 @@ public class ItemPickerDialog {
             "自定义",
     };
 
-    private static int[] ITEM_ICON_SELECTED_ID = {
-            R.drawable.cany_select,
-            R.drawable.chux_select,
-            R.drawable.diany_select,
-            R.drawable.fangc_select,
+    public static int[] ITEM_INCOME_ICON_SELECTED_ID = {
             R.drawable.gongz_select,
-            R.drawable.gouw_select,
-            R.drawable.chongw_select,
             R.drawable.cunk_select,
             R.drawable.dap_select,
             R.drawable.gup_select,
             R.drawable.jij_select,
             R.drawable.maj_select,
+    };
+
+    public static int[] ITEM_EXPEND_ICON_SELECTED_ID = {
+            R.drawable.cany_select,
+            R.drawable.chux_select,
+            R.drawable.diany_select,
+            R.drawable.fangc_select,
+            R.drawable.gouw_select,
+            R.drawable.chongw_select,
             R.drawable.other2_select,
             R.drawable.other3_select,
             R.drawable.other4_select,
@@ -186,19 +227,13 @@ public class ItemPickerDialog {
             R.drawable.zidy_select,
     };
 
-    private static int[] ITEM_ICON_NORMAL_ID = {
+    public static int[] ITEM_EXPEND_ICON_NORMAL_ID = {
             R.drawable.cany,
             R.drawable.chux,
             R.drawable.diany,
             R.drawable.fangc,
-            R.drawable.gongz,
             R.drawable.gouw,
             R.drawable.chongw,
-            R.drawable.cunk,
-            R.drawable.dap,
-            R.drawable.gup,
-            R.drawable.jij,
-            R.drawable.maj,
             R.drawable.other2,
             R.drawable.other3,
             R.drawable.other4,
@@ -216,15 +251,41 @@ public class ItemPickerDialog {
             R.drawable.zidy,
     };
 
-    public Item getItem(int position) {
-        return myDataset.get(position);
+    public static int[] ITEM_INCOME_ICON_NORMAL_ID = {
+            R.drawable.gongz,
+            R.drawable.cunk,
+            R.drawable.dap,
+            R.drawable.gup,
+            R.drawable.jij,
+            R.drawable.maj,
+    };
+
+    public Item getItem(int position, boolean isExpend) {
+        if (isExpend) {
+            return myExpendset.get(position);
+        } else {
+            return myIncomeset.get(position);
+        }
     }
 
     public Item getItem(String key) {
-        for (Item item:myDataset) {
+        for (Item item: myExpendset) {
+            if (key.contains(item.mItemName)) return item;
+        }
+        for (Item item: myIncomeset) {
             if (key.contains(item.mItemName)) return item;
         }
         return null;
+    }
+
+    public int getItemIconNormalId(String key) {
+        for (Item item: myExpendset) {
+            if (key.contains(item.mItemName)) return item.mIconNormalId;
+        }
+        for (Item item: myIncomeset) {
+            if (key.contains(item.mItemName)) return item.mIconNormalId;
+        }
+        return myExpendset.get(myExpendset.size() -1).mIconNormalId;
     }
 
     private void initItemPicker() {
@@ -239,7 +300,7 @@ public class ItemPickerDialog {
         mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(mContext, onItemClickListener));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        mAdapter = new MyAdapter(mContext, myDataset);
+        mAdapter = new MyAdapter(mContext, myExpendset);
         mRecyclerView.setAdapter(mAdapter);
     }
 
@@ -359,8 +420,8 @@ public class ItemPickerDialog {
 
         public void update(int position) {
             if (position == mLastSelectedIndes) return;
-            myDataset.get(position).isChecked = true;
-            myDataset.get(mLastSelectedIndes).isChecked = false;
+            myExpendset.get(position).isChecked = true;
+            myExpendset.get(mLastSelectedIndes).isChecked = false;
             mLastSelectedIndes = position;
             notifyDataSetChanged();
         }

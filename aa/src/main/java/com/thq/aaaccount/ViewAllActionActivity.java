@@ -81,7 +81,9 @@ public class ViewAllActionActivity extends AppCompatActivity {
         mRecyclerView.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST));
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST);
+        dividerItemDecoration.setmDivider(getDrawable(R.drawable.list_divider));
+        mRecyclerView.addItemDecoration(dividerItemDecoration);
 //        mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, onItemClickListener));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
@@ -427,7 +429,7 @@ public class ViewAllActionActivity extends AppCompatActivity {
     public void restoreActivity() {
         File a=new File(mBackupDir);
         final String[] file=a.list();
-        if (file.length == 0) {
+        if (file == null || file.length == 0) {
             Toast.makeText(ViewAllActionActivity.this, "没有可还原数据！！", Toast.LENGTH_SHORT).show();
             return;
         }

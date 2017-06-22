@@ -138,16 +138,11 @@ public class CreateActionActivity extends AppCompatActivity {
 
         initDatePicker();
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                mMemberSet = MemberDict.getIntance().getMembers(CreateActionActivity.this);
-                if (mMemberSet != null) {
-                    mMembers = new String[mMemberSet.size()];
-                    mMembers = mMemberSet.toArray(mMembers);
-                }
-            }
-        }).start();
+        mMemberSet = MemberDict.getIntance().getMembers(CreateActionActivity.this);
+        if (mMemberSet != null) {
+            mMembers = new String[mMemberSet.size()];
+            mMembers = mMemberSet.toArray(mMembers);
+        }
     }
 
     private void initDatePicker() {
@@ -412,6 +407,7 @@ public class CreateActionActivity extends AppCompatActivity {
         for (String s : mActivitySet) {
             if (s.split("\\#")[0].equals(mActivityName)) {
                 selectedItem = s;
+                break;
             }
         }
 

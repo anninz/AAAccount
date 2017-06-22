@@ -2,6 +2,7 @@ package com.thq.aaaccount;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 
 /**
@@ -18,6 +19,17 @@ public class SplashActivity extends AppCompatActivity {
         /** 注意, 这里并没有setContentView, 单纯只是用来跳转到相应的Activity
          *  目的是减少首屏渲染
          * */
+        setContentView(R.layout.activity_splash);
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                init();
+            }
+        },500l);
+    }
+
+    public void init() {
         this.startActivity(new Intent(this, MainActivity.class));
         finish();
     }

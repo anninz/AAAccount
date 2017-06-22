@@ -2,6 +2,7 @@ package com.thq.aaaccount;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
@@ -115,6 +116,18 @@ public class MultiAlertDialog {
                 listener.done(result);
 
                 mSelectedMembersNum = selectedMemberIndex.size();
+                // 关闭提示框
+                alertDialog3.dismiss();
+            }
+        });
+        alertDialogBuilder.setNeutralButton("编辑", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface arg0, int arg1) {
+                //TODO 业务逻辑代码
+
+                Intent intent = new Intent(mContext, EditMembersActivity.class);
+                mContext.startActivity(intent);
                 // 关闭提示框
                 alertDialog3.dismiss();
             }

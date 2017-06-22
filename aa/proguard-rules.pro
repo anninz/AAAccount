@@ -150,3 +150,6 @@
 -keep class com.android.model.** {*;}
 
 ####混淆保护自己项目的部分代码以及引用的第三方jar包library-end####
+
+#PieChart没有动画
+-keep class com.github.mikephil.charting.animation.** {*;}

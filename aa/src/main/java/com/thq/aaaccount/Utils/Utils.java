@@ -4,6 +4,15 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -88,5 +97,49 @@ public class Utils {
 //        SharedPreferences.Editor editor = sp.edit();
 //        editor.putStringSet(key, value);
 //        editor.commit();
+    }
+
+
+    public static Set<String> sortByValue(Set<String> set, final int index, final boolean isDimi){
+        if (set == null) return null;
+        List<String> setList= new ArrayList<String>(set);
+        Collections.sort(setList, new Comparator<Object>() {
+            @Override
+            public int compare(Object o1, Object o2) {
+                // TODO Auto-generated method stub
+                if (isDimi) {
+                    return o2.toString().split("\\#")[index].compareTo(o1.toString().split("\\#")[index]);
+                } else {
+                    return o1.toString().split("\\#")[index].compareTo(o2.toString().split("\\#")[index]);
+                }
+            }
+
+        });
+        set = new LinkedHashSet<String>(setList);//这里注意使用LinkedHashSet
+        return set;
+    }
+
+    public static int convertDpToPixel(Context context, int dp) {
+        float density = context.getResources().getDisplayMetrics().density;
+        return Math.round((float) dp * density);
+    }
+
+    public static int convertDpToPixel(int dp) {
+        float density = mContext.getResources().getDisplayMetrics().density;
+        return Math.round((float) dp * density);
+    }
+
+    public static Calendar convertStringToDate(String currentDate) {
+        Date date = null;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");//小写的mm表示的是分钟
+        Calendar ca = Calendar.getInstance();
+        try {
+            date = sdf.parse(currentDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        ca.setTime(date);
+        return ca;
     }
 }

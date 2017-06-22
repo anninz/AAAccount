@@ -8,9 +8,6 @@ import android.support.v7.widget.Toolbar;
 
 import com.thq.aaaccount.widget.SlidingTabLayout;
 
-import java.util.ArrayList;
-import java.util.List;
-
 
 public class BillFragmentActivity extends AppCompatActivity implements FragmentInteraction {
 
@@ -32,7 +29,7 @@ public class BillFragmentActivity extends AppCompatActivity implements FragmentI
         }
 
 
-        setContentView(R.layout.fragment_viewpager);
+        setContentView(R.layout.fragment_viewpager_bill);
         mTabLayout = (SlidingTabLayout) findViewById(R.id.tab_layout);
         mPage = (ViewPager) findViewById(R.id.viewPager);
         mToolbar = (Toolbar) findViewById(R.id.toolbar);

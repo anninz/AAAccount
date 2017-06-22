@@ -21,7 +21,7 @@
         android:layout_alignLeft="@+id/button2"
         android:layout_alignParentRight="true"
         android:layout_below="@+id/button2"
-        android:onClick="showSingleAlertDialog"
+        android:onClick="showWalletAlertDialog"
         android:text="单选列表" />
     <Button
         android:id="@+id/button4"

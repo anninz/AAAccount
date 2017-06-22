@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="45dp"
+    android:layout_marginLeft="@dimen/child_view_margin_short"
+    android:layout_marginRight="@dimen/child_view_margin_short"
+    android:layout_marginTop="@dimen/child_view_margin_4dp"
+    android:layout_marginBottom="@dimen/child_view_margin_4dp"
+    android:clickable="true"
+    android:background="@drawable/news_item"
+    android:gravity="center_vertical"
+    >
+
+        <EditText
+            android:text="TextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/view_edit_name"
+            android:layout_weight="1"
+            />
+
+        <Button
+            android:text="—"
+            android:layout_width="28dp"
+            android:layout_height="20dp"
+            android:textColor="@android:color/holo_red_light"
+            android:id="@+id/button7"
+            android:background="@color/list_item"
+            android:layout_weight="0.1" />
+</LinearLayout>

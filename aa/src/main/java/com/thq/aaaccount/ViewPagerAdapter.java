@@ -23,10 +23,10 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
         Fragment mFragemnt=null;
         switch(Index) {
           case Fragment_Index_0:
-              mFragemnt=new Fragment_0();
+              mFragemnt=new Fragment_ABill();
               break;
           case Fragment_Index_1:
-              mFragemnt=new Fragment_1();
+              mFragemnt=new Fragment_ABB();
               break;
         }
         return mFragemnt;

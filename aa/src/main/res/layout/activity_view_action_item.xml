@@ -5,36 +5,30 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <include
+<!--    <include
         android:id="@+id/appbar"
-        layout="@layout/include_toolbar" />
-<!--    <LinearLayout
-        android:id="@+id/button_layout"
+        layout="@layout/include_toolbar" />-->
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/child_view_margin_top"
-        >
-        <Button
-            android:text="创建消费项"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/child_view_margin_short"
-            android:layout_marginRight="@dimen/child_view_margin_short"
-            android:onClick="createActionItem"
-            android:id="@+id/add_action"
-            android:layout_weight="1"
-            />
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        android:transitionName="all">
 
-        <Button
-            android:text="获取消费明细"
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="@dimen/child_view_margin_short"
-            android:onClick="getBill"
-            android:id="@+id/get_bill"
-            android:layout_weight="1"
-            />
-    </LinearLayout>-->
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"/>
+    </android.support.design.widget.AppBarLayout>
+<!--
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/image"
+        android:src="@drawable/pic5"
+        android:scaleType="centerCrop"
+        android:transitionName="all"/>-->
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recyclerView"
@@ -59,19 +53,44 @@
         android:visibility="gone"
         android:id="@+id/item_hint" />
 
-    <com.github.clans.fab.FloatingActionMenu
-            android:id="@+id/menu_labels_right"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentBottom="true"
-            android:paddingRight="10dp"
-            android:paddingBottom="10dp"
-            android:paddingLeft="10dp"
-            fab:menu_labels_ellipsize="end"
-            fab:menu_labels_singleLine="true"
-            fab:menu_backgroundColor="#ccffffff"
-            fab:menu_labels_position="left">
 
+    <com.github.clans.fab.FloatingActionMenu
+        android:id="@+id/menu_labels_right"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:paddingRight="10dp"
+        android:paddingBottom="10dp"
+        android:paddingLeft="10dp"
+        fab:menu_labels_ellipsize="end"
+        fab:menu_labels_singleLine="true"
+        fab:menu_backgroundColor="#ccffffff"
+        fab:menu_labels_position="left"
+        >
+
+        <com.github.clans.fab.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_edit"
+            android:onClick="createAction"
+            fab:fab_size="mini"
+            fab:fab_label="创建活动" />
+
+        <com.github.clans.fab.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_edit"
+            android:onClick="gotoAllAction"
+            fab:fab_size="mini"
+            fab:fab_label="所有活动" />
+
+        <!--        <com.github.clans.fab.FloatingActionButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_edit"
+                    android:onClick="gotoAction"
+                    fab:fab_size="mini"
+                    fab:fab_label="最近活动" />-->
         <com.github.clans.fab.FloatingActionButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -80,14 +99,14 @@
             fab:fab_size="mini"
             fab:fab_label="结账" />
 
-            <com.github.clans.fab.FloatingActionButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_edit"
-                android:onClick="createActionItem"
-                fab:fab_size="mini"
-                fab:fab_label="创建消费项" />
+        <com.github.clans.fab.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_edit"
+            android:onClick="createActionItem"
+            fab:fab_size="mini"
+            fab:fab_label="创建消费项" />
 
-        </com.github.clans.fab.FloatingActionMenu>
+    </com.github.clans.fab.FloatingActionMenu>
 
 </RelativeLayout>
